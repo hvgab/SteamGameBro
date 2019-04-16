@@ -1,0 +1,37 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if users %}
+<!-- selected users -->
+<div class="">
+  {% for user in users %}
+  {{ user.personaname }}
+  {% endfor %}
+</div>
+
+<!-- friends of users -->
+<div class="">
+  <h2>Who else is joining?</h2>
+  <div class="">
+    <ul>
+      {% for user in users %}
+      {% for friend in user.friendlist %}
+      <li>friend.personaname</li>
+      {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% else %}
+<!-- WHO ARE YOU? -->
+<form class="" action="{% url 'steam:couch_home' %}" method="get">
+  <input type="text" name="steam_user_ids" value="gabbeh">
+  <button type="submit" name="">Submit</button>
+</form>
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,21 @@
+
+<table>
+  <thead>
+    <td>Avatar</td>
+    <td>SteamId</td>
+    <td>Name</td>
+  </thead>
+  {% for friend in friendlist %}
+    <tr>
+      <td><img src="{{friend.avatar}}" alt="{{friend.personaname}} avatar"></td>
+      <td>{{friend.steamid}}</td>
+      <td>{{friend.personaname}}</td>
+    </tr>
+  {% endfor %}
+</table>
+
+<pre>
+  <code>
+    {{ friendlist }}
+  </code>
+</pre>
