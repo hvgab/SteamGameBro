@@ -1,5 +1,8 @@
+{% extends 'base.html' %}
 
-<table>
+{% block body %}
+
+<table class="table is-striped">
   <thead>
     <td>Avatar</td>
     <td>SteamId</td>
@@ -19,3 +22,5 @@
     {{ friendlist }}
   </code>
 </pre>
+
+{% endblock body %}

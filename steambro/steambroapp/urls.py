@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .views import IndexView, UserGameListView, UserFriendListView
 from . import views
 
-app_name = 'steam'
+app_name = 'steambro'
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),

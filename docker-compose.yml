@@ -1,0 +1,52 @@
+
+version: '3.5'
+
+services:
+    web:
+        build: .
+        command: "python manage.py runserver 0.0.0.0:8000"
+        ports:
+            - 8000:8000
+        volumes:
+            - .:/code
+        depends_on: 
+            - db
+
+    db:
+        image: postgres
+        restart: always
+        environment: 
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: postgres
+        ports: 
+            - 5432:5432
+        volumes:
+            - postgresdata:/var/lib/postgresql/data
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
+        depends_on: 
+            - db
+    pgadmin:
+        image: dpage/pgadmin4
+        environment: 
+            PGADMIN_DEFAULT_EMAIL: steambro@example.com
+            PGADMIN_DEFAULT_PASSWORD: postgres
+            PGADMIN_LISTEN_ADDRESS: 0.0.0.0
+            PGADMIN_LISTEN_PORT: 5050
+        ports:
+            - 8081:5050
+        volumes:
+            - pgadmin:/root/.pgadmin
+            - pgadmin:/var/lib/pgadmin
+            - pgadmin:/pgadmin4/config_local.py
+            - pgadmin:/pgadmin4/servers.json
+        depends_on: 
+            - db
+volumes: 
+    postgresdata:
+    pgadmin:

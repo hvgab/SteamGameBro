@@ -56,3 +56,7 @@ docs/_build/
 
 # PyBuilder
 target/
+steambro/MEDIA_ROOT/SteamGame/
+steambro/.env
+steambro/db.sqlite3
+steambro/steambroproject/config.py

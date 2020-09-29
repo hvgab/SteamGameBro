@@ -13,4 +13,4 @@ class IndexView(View):
 class LogoutView(View):
     def get(self, request):
         logout(request)
-        return redirect('steam:index')
+        return redirect('steambroapp:index')

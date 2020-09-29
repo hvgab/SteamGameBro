@@ -1,21 +1,17 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 django = "*"
 social-auth-app-django = "*"
 pillow = "*"
-
+psycopg2 = "*"
+django-debug-toolbar = "*"
+django-developer-panel = "*"
 
 [dev-packages]
 
-
-
 [requires]
-
 python_version = "3.7"

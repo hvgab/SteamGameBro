@@ -1,7 +1,7 @@
 
 {% extends 'base.html' %}
 
-{% block content %}
+{% block body %}
 
 {% if users %}
 <!-- selected users -->
@@ -27,7 +27,7 @@
 
 {% else %}
 <!-- WHO ARE YOU? -->
-<form class="" action="{% url 'steam:couch_home' %}" method="get">
+<form class="" action="{% url 'steambro:couch_home' %}" method="get">
   <input type="text" name="steam_user_ids" value="gabbeh">
   <button type="submit" name="">Submit</button>
 </form>
