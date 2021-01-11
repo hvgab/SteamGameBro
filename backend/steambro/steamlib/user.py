@@ -2,7 +2,6 @@ import requests
 import os
 from pprint import pprint
 import logging
-from pprint import pprint
 from django.conf import settings
 
 log = logging.getLogger(__name__)
@@ -22,7 +21,7 @@ class SteamUser(object):
         self.personastate = None
 
         log.debug(f'init SteamUser {self.steamid}')
-        if not self.steamid.startswith('765'):
+        if not str(self.steamid).startswith('765'):
             self.resolveVanityUrl()
 
     def __repr__(self):
@@ -64,7 +63,7 @@ class SteamUser(object):
         log.debug(f'Resolve Vanity URL for {self.steamid!r}')
         resolveVanityUrl_url = 'http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/'
         payload = {
-            'key': os.getenv('STEAM_API_KEY'),
+            'key': settings.STEAM_API_KEY,
             'vanityurl': self.steamid
         }
 

@@ -59,6 +59,7 @@ class SteamUser(models.Model):
     
     # steamid - 64bit SteamID of the user
     steamid = models.BigIntegerField(unique=True)
+    steamid_text = models.CharField(max_length=255, blank=True, null=True)
     
     # personaname
     # The player's persona name (display name)

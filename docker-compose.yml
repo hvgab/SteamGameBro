@@ -2,15 +2,25 @@
 version: '3.5'
 
 services:
-    web:
-        build: .
+    backend:
+        build: "backend"
         command: "python manage.py runserver 0.0.0.0:8000"
         ports:
-            - 8000:8000
+            - 3000:8000
         volumes:
-            - .:/code
+            - ./backend:/code
         depends_on: 
             - db
+    
+    frontend:
+        build: "frontend"
+        ports:
+            - 8000:8080
+        volumes:
+            - ./frontend:/code
+        depends_on:
+            - backend
+
 
     db:
         image: postgres
@@ -47,6 +57,10 @@ services:
             - pgadmin:/pgadmin4/servers.json
         depends_on: 
             - db
+
+    rabbitmq:
+        image: rabbitmq:3.8-rc
+        
 volumes: 
     postgresdata:
     pgadmin:

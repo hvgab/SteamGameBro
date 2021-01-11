@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 'django_celery_results',
     'account',
     'social_django',
     'steambroapp',
@@ -184,3 +185,9 @@ LOGGING = {
         'level': 'DEBUG',
     },
 }
+
+
+CELERY_TIMEZONE = "Europe/Oslo"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_RESULT_BACKEND = 'django-db'

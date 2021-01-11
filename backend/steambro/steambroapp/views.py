@@ -19,7 +19,7 @@ def couch_home(request):
     id64_steam_user_ids = []
     if steam_user_ids:
         steam_user_ids = steam_user_ids.split(',')
-
+                
         for id in steam_user_ids:
             if not id.startswith('765'):
                 log.debug(f'ID {id!r} does not start with 765')

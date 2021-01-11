@@ -60,3 +60,4 @@ steambro/MEDIA_ROOT/SteamGame/
 steambro/.env
 steambro/db.sqlite3
 steambro/steambroproject/config.py
+backend/steambro/MEDIA_ROOT/SteamGame/

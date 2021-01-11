@@ -13,42 +13,38 @@
   <body>
     <!-- NAVBAR START -->
     <nav class="navbar" role="navigation" aria-label="main navigation">
+      
+      <!-- BRAND -->
       <div class="navbar-brand">
         <a class="navbar-item has-text-weight-bold" href="{% url "steambro:index" %}">
           <span>SteamBro</span>
         </a>
       </div>
 
+      <!-- NAV MENU -->
       <div id="navbarBasicExample" class="navbar-menu is-active">
+        
+        <!-- NAV MENU START -->
         <div class="navbar-start">
-          {% comment %}
-          {% endcomment %}
           <a class="navbar-item" href="{% url 'steambro:couch_home' %}">
             Couch
           </a>
-          <div class="navbar-item has-dropdown is-hoverable">
-            <a class="navbar-link" href="{% url 'steambro:usergamelist' %}">
-              User
-            </a>
-            <div class="navbar-dropdown">
-              <a class="navbar-link" href="{% url 'steambro:usergamelist' %}">
-                UserGameList
-              </a>
-              <a class="navbar-item" href="{% url 'steambro:userfriendlist' %}">
-                UserFriendList
-              </a>
-            </div>
-          </div>
+          <a class="navbar-item" href="{% url 'steambro:usergamelist' %}">
+            UserGameList
+          </a>
+          <a class="navbar-item" href="{% url 'steambro:userfriendlist' %}">
+            UserFriendList
+          </a>
         </div>
-
+        
+        <!-- NAV MENU END -->
         <div class="navbar-end">
-
+          <!-- PROFILE -> LOGGED IN -->
           {% if request.user.is_authenticated %}
           <div class="navbar-item has-dropdown is-hoverable">
             <a class="navbar-link">
               {{ request.user.personaname }} <img src="{{ request.user.avatar }}" alt="">
             </a>
-
             <div class="navbar-dropdown is-right">
               {% if request.user.is_staff %}
                 <a class="navbar-item" href="{% url 'admin:index' %}">Admin</a>
@@ -62,9 +58,10 @@
               </a>
             </div>
           </div>
+
+          <!-- PROFILE - NOT LOGGED IN -->
           {% else %}
           <div class="navbar-item">
-            {% comment %} <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pjxzdmcgdmlld0JveD0iMCAwIDI0IDI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0aXRsZS8+PGcgaWQ9IlN0ZWFtIj48ZyBkYXRhLW5hbWU9IiZsdDtHcm91cCZndDsiIGlkPSJfR3JvdXBfIj48Y2lyY2xlIGN4PSIxNS41IiBjeT0iOS41IiBkYXRhLW5hbWU9IiZsdDtQYXRoJmd0OyIgaWQ9Il9QYXRoXyIgcj0iMiIgc3R5bGU9ImZpbGw6bm9uZTtzdHJva2U6IzMwM2M0MjtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQiLz48cGF0aCBkPSJNNi42OCwxOC41QTIsMiwwLDEsMCw4LjI2LDE1IiBkYXRhLW5hbWU9IiZsdDtQYXRoJmd0OyIgaWQ9Il9QYXRoXzIiIHN0eWxlPSJmaWxsOm5vbmU7c3Ryb2tlOiMzMDNjNDI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kIi8+PHBhdGggZD0iTTEyLC41QTExLjUsMTEuNSwwLDAsMCwuNSwxMmMwLC4xNywwLC4zNCwwLC41MWw0Ljg0LDIuMmEzLjQsMy40LDAsMCwxLDMuNDYtMS4xTDExLjU1LDEwYTQsNCwwLDAsMS0uMDUtLjU0LDQsNCwwLDEsMSw0LDRoMGwtNCwzLjI5YzAsLjA3LDAsLjE0LDAsLjIyYTMuNDksMy40OSwwLDAsMS02Ljk1LjUzTDEuMTcsMTUuODNBMTEuNSwxMS41LDAsMSwwLDEyLC41WiIgZGF0YS1uYW1lPSImbHQ7UGF0aCZndDsiIGlkPSJfUGF0aF8zIiBzdHlsZT0iZmlsbDpub25lO3N0cm9rZTojMzAzYzQyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZCIvPjwvZz48L2c+PC9zdmc+"> {% endcomment %}
             <div class="buttons">
               <a class="button is-primary" href="{% url "social:begin" "steam" %}">
                 <strong>Sign in with Steam</strong>
@@ -76,23 +73,29 @@
             </div>
           </div>
           {% endif %}
+        </div> <!-- navmenuend end -->
+      </div> <!-- navmenu  end-->
+    </nav>
+
+    {% block body %}
+    {% endblock %}
+
+    <footer class="footer">
+      <div class="columns">
+        <div class="column">
+          <ul>
+            <li class="title">Made with</li>
+            <li><a href="https://icons8.com/icon/43197/steam">Steam icon by Icons8</a></li>
+            <li>Bulma</li>
+          </ul>
+        </div>
+        <div class="column">
+          <ul>
+            <li class="title">Source</li>
+            <li>github</li>
+          </ul>
         </div>
       </div>
-      </nav>
-
-      {% block body %}
-      {% endblock %}
-
-      <footer class="footer">
-        <div class="columns">
-          <div class="column">
-            <ul>
-              <li class="title">Made with</li>
-              <li><a href="https://icons8.com/icon/43197/steam">Steam icon by Icons8</a></li>
-              <li>Bulma</li>
-            </ul>
-          </div>
-        </div>
-      </footer>
+    </footer>
   </body>
 </html>
