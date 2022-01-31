@@ -10,8 +10,11 @@ pillow = "*"
 psycopg2 = "*"
 django-debug-toolbar = "*"
 django-developer-panel = "*"
+celery = "*"
+requests = "*"
+social-auth-core = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.7"
+python_version = "3.10"

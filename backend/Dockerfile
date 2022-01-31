@@ -1,12 +1,14 @@
 
-FROM python:3.7
+FROM python:3.10
 
-COPY requirements.txt requirements.txt
+RUN pip install pipenv
 
-RUN pip install -r requirements.txt
+ENV PROJECT_DIR /app
 
-RUN mkdir /code
-COPY . /code
-WORKDIR /code/steambro
+WORKDIR ${PROJECT_DIR}
 
-EXPOSE 8000
+COPY Pipfile Pipfile.lock ${PROJECT_DIR}
+
+RUN pipenv install --system --deploy
+
+WORKDIR /app/steambro

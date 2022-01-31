@@ -7,7 +7,7 @@ from urllib.request import urlopen
 from django.core.files import File
 from django.core.exceptions import ObjectDoesNotExist
 import logging
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 import requests
 import json

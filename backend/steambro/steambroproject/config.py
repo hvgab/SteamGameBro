@@ -1,0 +1,2 @@
+SECRET_KEY = 'QWEqweqwe'
+STEAM_API_KEY = 'QWEqweQWE'

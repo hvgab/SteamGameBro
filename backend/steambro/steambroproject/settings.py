@@ -72,7 +72,7 @@ ROOT_URLCONF = 'steambroproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['steambroproject/templates'],
+        'DIRS': ['steambro/steambroproject/templates', 'steambroproject/templates',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -91,6 +91,8 @@ WSGI_APPLICATION = 'steambroproject.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 DATABASES = {
     # 'default': {

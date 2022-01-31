@@ -6,9 +6,13 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'steambroproject.settings')
 
 app = Celery('steambroproject')
 
+print (app)
+
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-app.autodiscovery_tasks()
+print(app)
+
+app.autodiscover_tasks()
 
 @app.task(bind=True)
 def debug_task(self):
