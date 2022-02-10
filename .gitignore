@@ -63,3 +63,4 @@ steambro/steambroproject/config.py
 backend/steambro/MEDIA_ROOT/SteamGame/
 frontend/node_modules/*
 backend/steambro/steambroproject/config.py
+backend/steambro/steambroproject/config.py
