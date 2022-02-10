@@ -1,0 +1,63 @@
+
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="section">
+    
+    <table class="table">
+        <tr>
+            <th>Steam ID</th>
+            <td>{{object.steamid}}</td>
+        </tr>
+        <tr>
+            <th>Persona Name</th>
+            <td>{{object.personaname}}</td>
+        </tr>
+    </table>
+</section>
+
+<section class="section">
+    <h1 class="title">Friends</h1>
+    <table class="table">
+        <tr>
+            <td>friend.steamid</td>
+            <td>friend.personaname</td>
+            <td>friend.personaname</td>
+            <td>Actions</td>
+        </tr>
+        {% for friend in object.friendships.all %}
+        <tr>
+            <td>{{friend.steamid}}</td>
+            <td>{{friend.personaname}}</td>
+            <td>{{friend.personaname}}</td>
+            <td>
+                <a href="{% url 'steambro:steam-user-detail-view' friend.pk %}">
+                    View
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</section>
+
+<section class="section">
+    <h1 class="title">Friendships</h1>
+    <table class="table">
+        {% for friend in object.get_friendships.all %}
+        <tr>
+            <td>{{friend}}</td>
+            {% comment %} <td>{{friend.personaname}}</td> {% endcomment %}
+            {% comment %} <td>{{friend.personaname}}</td> {% endcomment %}
+            <td>
+                {% comment %} <a href="{% url 'steambro:steam-user-detail-view' friend.pk %}"> {% endcomment %}
+                    {% comment %} View {% endcomment %}
+                {% comment %} </a> {% endcomment %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</section>
+
+
+
+{% endblock content %}

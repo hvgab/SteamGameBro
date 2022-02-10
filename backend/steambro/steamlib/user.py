@@ -142,7 +142,7 @@ class SteamUser(object):
 if __name__ == "__main__":
 
     #u = steamUser('76561197983132487')
-    u = steamUser('gabbeh')
+    u = SteamUser('gabbeh')
     # log.debug (u)
     friends = u.getFriendList()
     games = u.getOwnedGames()

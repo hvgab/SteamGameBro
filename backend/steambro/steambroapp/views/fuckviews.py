@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from steamlib import SteamUser as SteamUserAPI
-from .models import SteamUser
-from .models import SteamGame
+from ..models import SteamUser
+from ..models import SteamGame
 from pprint import pprint
 import logging
 
@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 
 def couch_home(request):
     log.debug(f'req user: {request.user.steamid}')
-    host = SteamUser.manager.get_or_api(steamid=request.user.steamid)
+    host = SteamUser.objects.get(steamid=request.user.steamid)
     # friends = SteamUser.objects.get(steamid=request.user.steamid)
 
     steam_user_ids = request.GET.get('steam_user_ids', None)

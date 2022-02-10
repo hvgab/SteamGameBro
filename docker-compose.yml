@@ -34,32 +34,32 @@ services:
         volumes:
             - postgresdata:/var/lib/postgresql/data
 
-    adminer:
-        image: adminer
-        restart: always
-        ports:
-            - 8080:8080
-        depends_on: 
-            - db
-    pgadmin:
-        image: dpage/pgadmin4
-        environment: 
-            PGADMIN_DEFAULT_EMAIL: steambro@example.com
-            PGADMIN_DEFAULT_PASSWORD: postgres
-            PGADMIN_LISTEN_ADDRESS: 0.0.0.0
-            PGADMIN_LISTEN_PORT: 5050
-        ports:
-            - 8081:5050
-        volumes:
-            - pgadmin:/root/.pgadmin
-            - pgadmin:/var/lib/pgadmin
-            - pgadmin:/pgadmin4/config_local.py
-            - pgadmin:/pgadmin4/servers.json
-        depends_on: 
-            - db
+    # adminer:
+    #     image: adminer
+    #     restart: always
+    #     ports:
+    #         - 8080:8080
+    #     depends_on: 
+    #         - db
+    # pgadmin:
+    #     image: dpage/pgadmin4
+    #     environment: 
+    #         PGADMIN_DEFAULT_EMAIL: steambro@example.com
+    #         PGADMIN_DEFAULT_PASSWORD: postgres
+    #         PGADMIN_LISTEN_ADDRESS: 0.0.0.0
+    #         PGADMIN_LISTEN_PORT: 5050
+    #     ports:
+    #         - 8081:5050
+    #     volumes:
+    #         - pgadmin:/root/.pgadmin
+    #         - pgadmin:/var/lib/pgadmin
+    #         - pgadmin:/pgadmin4/config_local.py
+    #         - pgadmin:/pgadmin4/servers.json
+    #     depends_on: 
+    #         - db
 
-    rabbitmq:
-        image: rabbitmq:3.8-rc
+    # rabbitmq:
+    #     image: rabbitmq:3.8-rc
         
 volumes: 
     postgresdata:

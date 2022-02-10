@@ -13,6 +13,9 @@ django-developer-panel = "*"
 celery = "*"
 requests = "*"
 social-auth-core = "*"
+djangorestframework = "*"
+django-cors-headers = "*"
+docutils = "*"
 
 [dev-packages]
 

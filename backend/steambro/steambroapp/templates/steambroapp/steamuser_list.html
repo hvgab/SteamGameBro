@@ -1,0 +1,30 @@
+
+{% extends 'base.html' %}
+{% block content %}
+
+<table class="table">
+    <tr>
+        <th>ID</th>
+        <th>SteamID</th>
+        <th>PersonaName</th>
+        <th>Profile URL</th>
+        <th>Real Name</th>
+        <th>Friends</th>
+        <th>Actions</th>
+    </tr>
+    {% for object in object_list %}
+    <tr>
+        <td>{{object.id}}</td>
+        <td>{{object.steamid}}</td>
+        <td>{{object.personaname}}</td>
+        <td>{{object.profileurl}}</td>
+        <td>{{object.realname}}</td>
+        <td>{{object.friends}}</td>
+        <td>
+            <a href="{% url 'steambro:steam-user-detail-view' object.pk %}">View</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock content %}

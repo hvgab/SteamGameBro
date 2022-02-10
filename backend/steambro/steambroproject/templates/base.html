@@ -26,13 +26,13 @@
         
         <!-- NAV MENU START -->
         <div class="navbar-start">
-          <a class="navbar-item" href="{% url 'steambro:couch_home' %}">
+          <a class="navbar-item" href="{% url 'steambroapp:couch_home' %}">
             Couch
           </a>
-          <a class="navbar-item" href="{% url 'steambro:usergamelist' %}">
+          <a class="navbar-item" href="{% url 'steambroapp:usergamelist' %}">
             UserGameList
           </a>
-          <a class="navbar-item" href="{% url 'steambro:userfriendlist' %}">
+          <a class="navbar-item" href="{% url 'steambroapp:userfriendlist' %}">
             UserFriendList
           </a>
         </div>
@@ -77,21 +77,21 @@
       </div> <!-- navmenu  end-->
     </nav>
 
-    {% block body %}
+    {% block content %}
     {% endblock %}
 
-    <footer class="footer">
+    <footer class="section is-dark">
       <div class="columns">
         <div class="column">
           <ul>
-            <li class="title">Made with</li>
+            <li class="title is-4">Made with</li>
             <li><a href="https://icons8.com/icon/43197/steam">Steam icon by Icons8</a></li>
             <li>Bulma</li>
           </ul>
         </div>
         <div class="column">
           <ul>
-            <li class="title">Source</li>
+            <li class="title is-4">Source</li>
             <li>github</li>
           </ul>
         </div>

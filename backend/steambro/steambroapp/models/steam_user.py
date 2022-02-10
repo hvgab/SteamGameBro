@@ -1,88 +1,51 @@
-from django.core.validators import validate_comma_separated_integer_list
+import pprint
+import django
 from django.db import models
-from steamlib import SteamGame as SteamGameAPI
-from steamlib import SteamUser as SteamUserAPI
-from tempfile import NamedTemporaryFile
-from urllib.request import urlopen
-from django.core.files import File
-from django.core.exceptions import ObjectDoesNotExist
-import logging
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import validate_comma_separated_integer_list
+import logging
 from django.conf import settings
 import requests
 import json
 from django.utils import timezone
 import datetime as dt
-from pprint import pprint
-import django
+from django.db import transaction
 
-log = logging.getLogger(__name__)
-
-
-class SteamUserManager(models.Manager):
-    def get_or_api(self, steamid):
-        try:
-            return super().get_queryset().get(steamid=steamid)
-        except ObjectDoesNotExist:
-            log.error(f'Object does not exist with steamid: {steamid}')
-
-            try:
-                log.debug('steamuser api')
-                steamUser_api = SteamUserAPI(steamid)
-                log.debug('get player summaries')
-                steamUser_api.getPlayerSummaries()
-                log.debug('got player summaries')
-
-                log.debug('creating instance')
-                instance = SteamUser(
-                    steamid=steamUser_api.steamid,
-                    personaname=steamUser_api.personaname,
-                    profileurl=steamUser_api.profileurl,
-                    avatar=steamUser_api.avatar,
-                    avatarmedium=steamUser_api.avatarmedium,
-                    avatarfull=steamUser_api.avatarfull)
-                log.debug('instance created')
-
-                log.debug('saving instance')
-                instance.save()
-                log.debug('instance saved')
-                return instance
-            except Exception as e:
-                raise
-
-        except Exception as e:
-            log.exception('Unknown Error')
+logger = logging.getLogger(__name__)
 
 
 class SteamUser(models.Model):
     ## Public Data
     
     # steamid - 64bit SteamID of the user
-    steamid = models.BigIntegerField(unique=True)
+    steamid = models.BigIntegerField(unique=True, help_text="64bit SteamID of the user")
     steamid_text = models.CharField(max_length=255, blank=True, null=True)
     
     # personaname
     # The player's persona name (display name)
-    personaname = models.CharField(max_length=255)
+    personaname = models.CharField(max_length=255, blank=True, null=True, help_text="The player's persona name (display name)")
     
     # profileurl
     # The full URL of the player's Steam Community profile.
-    profileurl = models.CharField(max_length=500)
+    profileurl = models.CharField(max_length=500, blank=True, null=True)
     
+    # avatarhash
+    avatarhash = models.CharField(max_length=500, blank=True, null=True)
+
     # avatar
     # The full URL of the player's 32x32px avatar. 
     # If the user hasn't configured an avatar, this will be the default ? avatar.
-    avatar = models.CharField(max_length=500)
+    avatar = models.CharField(max_length=500, blank=True, null=True)
     
     # avatarmedium
     # The full URL of the player's 64x64px avatar. 
     # If the user hasn't configured an avatar, this will be the default ? avatar.
-    avatarmedium = models.CharField(max_length=500)
+    avatarmedium = models.CharField(max_length=500, blank=True, null=True)
     
     # avatarfull
     # The full URL of the player's 184x184px avatar. 
     # If the user hasn't configured an avatar, this will be the default ? avatar.
-    avatarfull = models.CharField(max_length=500)
+    avatarfull = models.CharField(max_length=500, blank=True, null=True)
     
     # personastate 
     # The user's current status. 
@@ -151,15 +114,19 @@ class SteamUser(models.Model):
     # cityid
     # This value will be removed in a future update (see loccityid)
     
-    # loccountrycode
-    # If set on the user's Steam Community profile, The user's country of residence, 2-character ISO country code
+    loccountrycode = models.CharField(_("country coude"), max_length=5, blank=True, null=True, help_text="If set on the user's Steam Community profile, The user's country of residence, 2-character ISO country code")
     
-    # locstatecode
-    # If set on the user's Steam Community profile, The user's state of residence
+    locstatecode = models.CharField(_("state"), max_length=50, blank=True, null=True, help_text="If set on the user's Steam Community profile, The user's state of residence")
     
     # loccityid
     # An internal code indicating the user's city of residence. A future update will provide this data in a more useful way.
     # steam_location gem/package makes player location data readable for output.
+
+    # personastateflags
+
+    # lobbysteamid
+
+    # gameserversteamid
 
 
     owned_games_list = models.CharField(
@@ -167,17 +134,20 @@ class SteamUser(models.Model):
         blank=True,
         validators=[validate_comma_separated_integer_list])
     
-    games = models.ManyToManyField("steambroapp.SteamGame", verbose_name=_("games"))
-    friends = models.ManyToManyField('self', verbose_name=_("friends"), through='Friendship', symmetrical=True)
+    games = models.ManyToManyField("steambroapp.SteamGame", verbose_name=_("games"), blank=True, null=True)
+    friendships = models.ManyToManyField('self', verbose_name=_("friends"), through='Friendship', symmetrical=False, related_name='related_to')
 
     # SteamBro
     updated_at = models.DateTimeField(_("updated at"), auto_now=True, auto_now_add=False)
     created_at = models.DateTimeField(_("created at"), auto_now=False, auto_now_add=True)
     objects = models.Manager()  # Default manager
-    manager = SteamUserManager()  # Custom manager
+    # manager = SteamUserManager()  # Custom manager
 
-    def update_steam_player_summary(self):
-        log.debug(f'update user with steamid {self.steamid!r}')
+    def refresh_summary(self):
+        """Refresh Steam User Summary from API to Database"""
+
+        logger.debug(f'<SteamUser({self.steamid!r}, {self.personaname!r})>.refresh_summary()')
+
         url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'  # ISteamUser_GetPlayerSummaries
         payload = {'key': settings.STEAM_API_KEY, 'steamids': self.steamid}
         r = requests.get(url, params=payload)
@@ -185,17 +155,20 @@ class SteamUser(models.Model):
         try:
             rj = r.json()
         except json.decoder.JSONDecodeError as e:
-            log.error(f'Json Decode Error on update steam player summary for {self.steamid}')
+            logger.error(f'Json Decode Error on update steam player summary for {self.steamid}')
             return
 
 
         # Get Data
+        if len(rj['response']['players']) <= 0:
+            return
+
         player_api_dict = rj['response']['players'][0]
         # Get Public Data
-        fields_as_int = ['personastate', 'communityvisibilitystate', 'profilestate', 'commentpermission', 'primaryclanid']
-        fields_unix_to_datetime = ['lastlogoff', 'timecreated']
+        fields_as_int = ['personastate', 'communityvisibilitystate', 'profilestate', 'commentpermission', 'primaryclanid',]
+        fields_unix_to_datetime = ['lastlogoff', 'timecreated',]
+        fields_ignore = ['gameid', 'gameserverip', 'gameextrainfo', 'loccityid', 'personastateflags', 'lobbysteamid', 'gameserversteamid']
 
-        log.info(f'updateing db from api for user {self.steamid}')
         for key in player_api_dict.keys():
             if (key in self.__dict__.keys()) and (key in player_api_dict.keys()):
                 if key in fields_as_int:
@@ -205,16 +178,27 @@ class SteamUser(models.Model):
                 else:
                     setattr(self, key, player_api_dict[key])
             else:
-                log.warning(f'Key {key.upper()} not in class attributes')
+                if key.lower() not in fields_ignore:
+                    logger.warning(f'Key {key.upper()} not in class attributes')
+                    logger.debug('player_api_dict')
+                    logger.debug(pprint.pformat(player_api_dict))
+                    logger.debug(f'player_api_dict[{key}]')
+                    logger.debug(pprint.pformat(player_api_dict[key]))
+                    input('...')
 
         try:
             self.save()
         except django.db.utils.DataError as e:
-            log.error(e)
-            log.error(self)
+            logger.error(e)
+            logger.error(self)
             input('...')
 
-    def get_steam_friends(self):
+        return self
+
+    def refresh_friendships(self):
+
+        logger.debug(f'<SteamUser({self.steamid!r}, {self.personaname!r})>.refresh_friendships()')
+
         url = 'http://api.steampowered.com/ISteamUser/GetFriendList/v0001/'  # ISteamUser GetFriendList
         payload = {
             'key': settings.STEAM_API_KEY,
@@ -226,28 +210,29 @@ class SteamUser(models.Model):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            log.error(f'Request error on get_steam_friends for {self.steamid}')
+            logger.error(f'Request error on get_steam_friends for {self.steamid}')
             return
 
+        # should we remove all friends here to remove old friendships?
         rj = r.json()
 
         steamid_list = []
         for friend in rj['friendslist']['friends']:
-            # log.debug(friend)
             friend_steamid = int(friend['steamid'])
             steamid_list.append(friend_steamid)
-            if SteamUser.objects.filter(steamid=friend_steamid).count() <= 0:
-                friendObject, created = SteamUser.objects.get_or_create(steamid=friend_steamid)
-                if created is True:
-                    friendObject.update_steam_player_summary()
-                    friendObject.save()
+            friendObject, created = SteamUser.objects.get_or_create(steamid=friend_steamid)
+            if created is True:
+                friendObject.refresh_summary()
+                friendObject.save()
 
-            # TODO: Save as friends here?
+            self.add_friendship(friendObject, timezone.make_aware(dt.datetime.fromtimestamp(friend['friend_since'])), friend['relationship'])
         
-        friendlist = SteamUser.objects.filter(steamid__in=steamid_list).all()
-        return friendlist
+        return self.get_friendships()
 
-    def get_steam_games(self):
+    def refresh_steam_games(self):
+
+        logger.debug(f'<SteamUser({self.steamid!r}, {self.personaname!r})>.refresh_steam_games()')
+        from .steam_game import SteamGame
         url = 'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/'  # ISteamUser GetOwnedGames
         payload = {
             'key': settings.STEAM_API_KEY,
@@ -261,16 +246,15 @@ class SteamUser(models.Model):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            log.error('request for games failed.')
+            logger.error('request for games failed.')
 
         rj = None
         try:
             rj = r.json()
         except Exception as e:
-            log.debug(e)
-            log.debug(f'payload: {payload}')
-            log.debug(r.text)
-            result = None
+            logger.error(e)
+            logger.error(f'payload: {payload}')
+            logger.error(r.text)
         
         if rj is None:
             return
@@ -280,21 +264,51 @@ class SteamUser(models.Model):
         if not 'games' in rj['response']:
             return
 
-        for game in rj['response']['games']:
-            game_appid_list.append(game['appid'])
-            if SteamGame.objects.filter(appid=game['appid']).count() <= 0:
-                game_object = SteamGame(
-                        appid = game['appid'],
-                        name = game['name'],
-                        icon_url = game['img_icon_url'],
-                        logo_url = game['img_logo_url']
-                )
-                game_object.save()
+        with transaction.atomic():
+            for game in rj['response']['games']:
+                # logger.debug(f'{game=}')
+                # logger.debug('update or create')
+                app, created = SteamGame.objects.update_or_create(appid=game['appid'], defaults=dict(
+                            name = game['name'],
+                            icon_url = game['img_icon_url'],
+                            logo_url = game['img_logo_url']
+                ))
+                # logger.debug(f'{created=}')
+                # logger.debug('app')
+                # logger.debug(app)
 
-        return SteamGame.objects.filter(appid__in=game_appid_list).all()
+                self.games.add(app)
+
+        return self.games
+
+    def add_friendship(self, steamuser: 'SteamUser', friends_since: dt.datetime, relationship: str, symm:bool=True):
+        from . import Friendship
+        friendship, created = Friendship.objects.get_or_create(
+            from_steamuser=self,
+            to_steamuser=steamuser,
+            friends_since=friends_since,
+            relationship=relationship)
+        if symm:
+            # avoid recursion by passing `symm=False`
+            steamuser.add_friendship(self, friends_since, relationship, symm=False)
+        return relationship
+
+    def remove_friendship(self, steamuser, symm=True):
+        from . import Friendship
+        Friendship.objects.filter(
+            from_steamuser=self,
+            to_steamuser=steamuser,
+            ).delete()
+        if symm:
+            # avoid recursion by passing `symm=False`
+            steamuser.remove_friendship(self, symm=False)
+
+    def get_friendships(self):
+        return self.friendships.filter(
+            to_steamusers__from_steamuser=self)
 
     def __str__(self):
-        return f'SteamUser<{self.steamid!r}, personaname={self.personaname!r}>'
+        return f'{self.personaname} ({self.steamid})'
                 # {self.profileurl!r}, \n\
                 # {self.avatar!r}, \n\
                 # {self.avatarmedium!r}, \n\
@@ -308,69 +322,3 @@ class SteamUser(models.Model):
                 # {self.realname!r}\n\
                 # {self.primaryclanid!r}\n\
                 # {self.timecreated!r}\n\
-
-
-class Friendship(models.Model):
-    from_steamuser_id = models.ForeignKey("steambroapp.SteamUser", verbose_name=_(""), on_delete=models.CASCADE, related_name='origin_friend')
-    to_steamuser_id = models.ForeignKey("steambroapp.SteamUser", verbose_name=_(""), on_delete=models.CASCADE, related_name='friend_origin')
-    friend_since = models.DateTimeField(_("friends since"), auto_now=False, auto_now_add=False)
-    relationship = models.CharField(_("relationship"), max_length=50)
-
-
-class SteamGameMangager(models.Manager):
-    def get_or_api(self, **kwargs):
-        pass
-
-
-class SteamGame(models.Model):
-    # Base App Info
-    appid = models.PositiveIntegerField()
-    name = models.CharField(max_length=255)
-    
-    # IMG
-    icon_url = models.CharField(max_length=500, blank=True, null=True)
-    icon = models.ImageField(upload_to='SteamGame', height_field=None, width_field=None, max_length=None, blank=True, null=True)
-    logo_url = models.CharField(max_length=500, blank=True, null=True)
-    logo = models.ImageField(upload_to='SteamGame', height_field=None, width_field=None, max_length=None, blank=True, null=True)
-    header_url = models.CharField(max_length=500, blank=True, null=True)
-    header = models.ImageField(upload_to='SteamGame', height_field=None, width_field=None, max_length=None, blank=True, null=True)
-    background_url = models.CharField(max_length=500, blank=True, null=True)
-    background = models.ImageField(upload_to='SteamGame', height_field=None, width_field=None, max_length=None, blank=True, null=True)
-
-    # Detailed App Info:
-    has_detailed_info = models.BooleanField(default=False)
-    detailed_description = models.TextField(blank=True, null=True)
-    about_the_game = models.TextField(blank=True, null=True)
-    short_description = models.TextField(blank=True, null=True)
-
-    # Webapp fields
-    created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True, auto_now_add=False)
-
-    def __repr__(self):
-        return f'<SteamGame({self.appid}, name={self.name!r})>'
-
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        """Overwrite default save function."""
-        self.get_remote_image()
-        super(SteamGame, self).save(*args, **kwargs)
-
-    def get_remote_image(self):
-        IMG_ICON_URL = f'http://media.steampowered.com/steamcommunity/public/images/apps/{self.appid}/{self.icon_url}.jpg'
-        IMG_LOGO_URL = f'http://media.steampowered.com/steamcommunity/public/images/apps/{self.appid}/{self.logo_url}.jpg'
-        if self.icon_url and not self.icon:
-            img_temp = NamedTemporaryFile(delete=True)
-            img_temp.write(urlopen(IMG_ICON_URL).read())
-            img_temp.flush()
-            self.icon.save(f'{self.appid}_icon', File(img_temp))
-
-        if self.logo_url and not self.logo:
-            img_temp = NamedTemporaryFile(delete=True)
-            img_temp.write(urlopen(IMG_LOGO_URL).read())
-            img_temp.flush()
-            self.logo.save(f'{self.appid}_logo', File(img_temp))
-
-        # self.save()

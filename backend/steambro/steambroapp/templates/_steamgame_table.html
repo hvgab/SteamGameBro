@@ -1,0 +1,24 @@
+
+{% load dev_tags %}
+
+<table class="table is-striped">
+    <thead>
+      <td>ID</td>
+      <td>Title</td>
+      {% comment %} <td>Icon</td> {% endcomment %}
+      {% comment %} <td>Logo</td> {% endcomment %}
+      <td>Icon</td>
+      <td>Logo</td>
+    </thead>
+    {% for game in game_list %}
+      <tr>
+        <td>{{game.appid}}</td>
+        <td>{{game.name}}</td>
+        {% comment %} <td><img src="{{ game.icon }}" alt=""></td> {% endcomment %}
+        {% comment %} <td><img src="{{ game.logo }}" alt=""></td> {% endcomment %}
+        <td><img src="http://media.steampowered.com/steamcommunity/public/images/apps/{{game.appid}}/{{game.icon_url}}.jpg" alt=""></td>
+        <td><img src="http://media.steampowered.com/steamcommunity/public/images/apps/{{game.appid}}/{{game.logo_url}}.jpg" alt=""></td>
+        <td>{{ game | dump }}</td>
+      </tr>
+    {% endfor %}
+  </table>
