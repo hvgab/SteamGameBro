@@ -65,4 +65,4 @@ frontend/node_modules/*
 backend/steambro/steambroproject/config.py
 backend/steambro/steambroproject/config.py
 backend/steambro/steambroproject/config.py
-steambro/MEDIA/*
+backend/steambro/MEDIA/SteamGame/*.png
