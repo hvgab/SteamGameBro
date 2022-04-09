@@ -3,7 +3,7 @@ from django.views import View
 from steamlib import SteamUser as SteamUserAPI
 from ..models import SteamUser
 from ..models import SteamGame
-from pprint import pprint
+from pprint import pprint, pformat
 import logging
 
 log = logging.getLogger(__name__)
@@ -66,16 +66,30 @@ class UserGameListView(View):
         appID_list_DB = [game.appid for game in all_games_DB]
         print(f'appID_list_DB: {appID_list_DB}')
 
+        user = SteamUser.get(steamid=steamid)
+        user_owns = user.games
+
         # Create cache or games not in DB.
         # Slows down original request, but speeds up later.
         for game in games_API:
             if game['appid'] not in appID_list_DB:
                 log.info(f'game {game["name"]} not in db')
-                game_instance = SteamGame(appid=game['appid'], icon_url=game['img_icon_url'], logo_url=game['img_logo_url'], name=game['name'])
+                log.debug(pformat(game))
+                img_logo_url = None
+                try:
+                    img_logo_url = game['img_logo_url']
+                except:
+                    pass
+                game_instance = SteamGame(appid=game['appid'], icon_url=game['img_icon_url'], logo_url=img_logo_url, name=game['name'])
                 game_instance.save()
                 log.info(f'game {game["name"]} saved to db')
             else:
                 log.debug(f'game {game["name"]} already in db')
+
+            # add as owned
+            if game['appid'] not in user.games:
+                game_ = SteamGame.get(appid=game['appid'])
+                user.games.add(game_)
                 
 
         # Get games from DB
@@ -83,7 +97,7 @@ class UserGameListView(View):
         games_DB = SteamGame.objects.filter(id__in=appID_list_API)
         log.debug(games_DB)
         return render(
-            request, 'usergamelist.html', context=dict(games=list(games_DB.all())))
+            request, 'usergamelist.html', context=dict(games=list(games_DB.all()), games_query=games_DB))
 
 
 class UserFriendListView(View):

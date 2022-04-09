@@ -16,6 +16,7 @@ social-auth-core = "*"
 djangorestframework = "*"
 django-cors-headers = "*"
 docutils = "*"
+django-service-objects = "*"
 
 [dev-packages]
 

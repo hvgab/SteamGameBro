@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from steambroapp.api.views import SteamGameViewSet, SteamUserViewSet
 from rest_framework import routers
 from .views import IndexView, SteamUserListView, SteamUserDetailView, SteamUserGamesListView
+from .views import SteamGameListView, SteamGameDetailView
 from .views import UserGameListView, UserFriendListView, couch_home
 from django.urls import path, include
 
@@ -20,11 +21,12 @@ urlpatterns = [
     path('', IndexView.as_view(), name='index'),
 
     # SteamUser
-    path('steamuser/', SteamUserListView.as_view(), name='steam-user-list-view'),
-    path('steamuser/<pk>', SteamUserDetailView.as_view(), name='steam-user-detail-view'),
-    path('steamuser/<pk>/games', SteamUserGamesListView.as_view(), name='steam-user-games-list-view'),
+    path('steamuser/', SteamUserListView.as_view(), name='steamuser-list'),
+    path('steamuser/<pk>', SteamUserDetailView.as_view(), name='steamuser-detail'),
+    path('steamuser/<pk>/games', SteamUserGamesListView.as_view(), name='steamuser-games-list'),
 
-    
+    path('steamgames/', SteamGameListView.as_view(), name='steamgame-list'),
+    path('steamgames/<pk>', SteamGameDetailView.as_view(), name='steamgame-detail'),
 
 
     path('user/gamelist', UserGameListView.as_view(), name='usergamelist'),

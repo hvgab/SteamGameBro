@@ -2,6 +2,10 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<section class="section">
+    <div class="container">
+
+{% include '_pagination.html' %}
 <table class="table">
     <tr>
         <th>ID</th>
@@ -12,19 +16,21 @@
         <th>Friends</th>
         <th>Actions</th>
     </tr>
-    {% for object in object_list %}
+    {% for object in page_obj %}
     <tr>
         <td>{{object.id}}</td>
         <td>{{object.steamid}}</td>
         <td>{{object.personaname}}</td>
         <td>{{object.profileurl}}</td>
-        <td>{{object.realname}}</td>
+        <td>{{object.realname|default:""}}</td>
         <td>{{object.friends}}</td>
         <td>
-            <a href="{% url 'steambro:steam-user-detail-view' object.pk %}">View</a>
+            <a href="{% url 'steambro:steamuser-detail' object.pk %}">View</a>
         </td>
     </tr>
     {% endfor %}
 </table>
-
+{% include '_pagination.html' %}
+</div>
+</section>
 {% endblock content %}

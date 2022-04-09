@@ -1,14 +1,11 @@
-
 {% extends 'base.html' %}
 {% load dev_tags %}
 {% block content %}
-
-{% include '_steamgame_table.html' %}
-
-<section class="section">
-    <div class="container">
-        
-    </div>
-</section>
-
+    <section class="section">
+        <div class="container">
+            {% include '_pagination.html' %}
+            {% include '_steamgame_table.html' %}
+            {% include '_pagination.html' %}
+        </div>
+    </section>
 {% endblock content %}

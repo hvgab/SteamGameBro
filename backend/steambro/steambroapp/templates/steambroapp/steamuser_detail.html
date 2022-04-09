@@ -31,7 +31,7 @@
             <td>{{friend.personaname}}</td>
             <td>{{friend.personaname}}</td>
             <td>
-                <a href="{% url 'steambro:steam-user-detail-view' friend.pk %}">
+                <a href="{% url 'steambro:steamuser-detail' friend.pk %}">
                     View
                 </a>
             </td>
@@ -49,7 +49,7 @@
             {% comment %} <td>{{friend.personaname}}</td> {% endcomment %}
             {% comment %} <td>{{friend.personaname}}</td> {% endcomment %}
             <td>
-                {% comment %} <a href="{% url 'steambro:steam-user-detail-view' friend.pk %}"> {% endcomment %}
+                {% comment %} <a href="{% url 'steambro:steamuser-detail' friend.pk %}"> {% endcomment %}
                     {% comment %} View {% endcomment %}
                 {% comment %} </a> {% endcomment %}
             </td>

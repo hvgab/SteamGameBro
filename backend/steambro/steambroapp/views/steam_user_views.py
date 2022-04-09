@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 class SteamUserListView(ListView):
     model = SteamUser
+    paginate_by = 50
 
 class SteamUserDetailView(DetailView):
     model = SteamUser
