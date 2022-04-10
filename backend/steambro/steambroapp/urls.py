@@ -1,6 +1,8 @@
 from django.urls import path
 from django.contrib.auth.decorators import login_required
-from steambroapp.api.views import SteamGameViewSet, SteamUserViewSet
+
+from .views.tinder import TinderView
+from .api.views import SteamGameViewSet, SteamUserViewSet, UserGameGroupViewSet
 from rest_framework import routers
 from .views import IndexView, SteamUserListView, SteamUserDetailView, SteamUserGamesListView
 from .views import SteamGameListView, SteamGameDetailView
@@ -12,6 +14,7 @@ app_name = 'steambro'
 router = routers.DefaultRouter()
 router.register('steam-game', SteamGameViewSet)
 router.register('steam-user', SteamUserViewSet)
+router.register('user-game-group', UserGameGroupViewSet)
 
 urlpatterns = [
     # API
@@ -34,4 +37,8 @@ urlpatterns = [
         'user/friendlist', UserFriendListView.as_view(),
         name='userfriendlist'),
     path('couch', couch_home, name='couch_home'),
+    
+    path('tinder/', TinderView.as_view(), name='tinder'),
+
+
 ]
