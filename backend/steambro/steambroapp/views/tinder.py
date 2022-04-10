@@ -26,6 +26,8 @@ class TinderView(View):
         random_game = SteamGame.objects.get(pk=random_pk)
 
         # refresh game?
+        if random_game.has_detailed_info is False:
+            services.refresh_steam_game_details(random_game.id)
         
         # Get system default group (yes, no)
         # system_game_groups = GameGroup.objects.filter(is_system_group=True).all()
@@ -38,80 +40,3 @@ class TinderView(View):
         # Let user choose YES or NO
         # POST
         # Redirect to same page
-
-
-        
-    
-
-
-class UserFriendListView(View):
-    def get(self, request, steamid=None):
-    
-        if not (request.user.is_authenticated or steamid):
-            return redirect('steambro:index')
-
-        if not steamid:
-            steamid = request.user.steamid
-        
-        # Get steam games from API
-        steamUserAPI = SteamUserAPI(request.user.steamid)
-        players = steamUserAPI.getFriendList()
-        # players_API = players['friendslist']['friends']
-        players_API = players
-
-        # friend_list_API = [fgame['appid'] for game in games_API]
-        # print(f'appID API: {appID_list_API}')
-
-        # Get all games in DB
-        all_players_DB = SteamUser.objects.all()
-        player_list_DB = [player.steamid for player in all_players_DB]
-        log.debug(f'\n\nplayer_list_DB: \n\n{player_list_DB}')
-        print(f'steamID_list_DB: {player_list_DB}')
-
-        # Create cache or games not in DB.
-        # Slows down original request, but speeds up later.
-        for player in players_API:
-            player_steamid = None
-            try:
-                player_steamid = int(player['steamid'])
-            except Exception as e:
-                log.error(f'steamid not int. ({player["steamid"]})')
-                continue
-            
-            if player_steamid is None:
-                continue
-            
-            if player_steamid in player_list_DB:
-                log.debug(f'{player_steamid} in db (all)')
-                continue
-
-            # TODO: Why do I have to check again here?
-            if SteamUser.objects.filter(steamid = player_steamid).count() > 0:
-                log.debug(f'{player_steamid} in db (single)')
-                continue
-
-            # If user does not exist, get and save.
-            log.info(f'player {player_steamid} not in db')
-            # get player data
-            playerAPI = SteamUserAPI(player_steamid)
-            playerAPI.getPlayerSummaries()
-            player_instance = SteamUser(
-                    steamid = playerAPI.steamid,
-                    personaname = playerAPI.personaname,
-                    profileurl = playerAPI.profileurl,
-                    avatar = playerAPI.avatar,
-                    avatarmedium = playerAPI.avatarmedium,
-                    avatarfull = playerAPI.avatarfull
-            )
-            player_instance.save()
-            log.info(f'player {playerAPI.personaname} ({playerAPI.steamid}) saved to db')
-        else:
-            log.debug(f'player {player_steamid} already in db')
-                
-
-        # Get games from DB
-        player_list_API = [player['steamid'] for player in players_API]
-        players_DB = SteamUser.objects.filter(steamid__in=player_list_API).all()
-
-        return render(
-            request, 'userfriendlist.html', context={'playerlist':players_DB, 'friendlist':players_DB})

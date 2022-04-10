@@ -1,5 +1,5 @@
 from django.db import models
-from .. import service
+from .. import services
 from ..models import SteamUser
 
 class SteamUserManager(models.Manager):
@@ -8,5 +8,5 @@ class SteamUserManager(models.Manager):
         try:
             return super().get_queryset().get(steamid=steamid)
         except SteamUser.ObjectDoesNotExist:
-            steam_user = service.refresh_steam_user_summary(steamid=steamid)
+            steam_user = services.refresh_steam_user_summary(steamid=steamid)
             return steam_user

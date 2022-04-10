@@ -5,7 +5,7 @@ import datetime as dt
 from django.utils import timezone
 import logging
 from steambroapp.utils import sync_player
-from ... import service
+from ... import services
 
 logger = logging.getLogger(__name__)
 
@@ -29,5 +29,5 @@ class Command(BaseCommand):
         if 'levels' in kwargs and kwargs['levels'] is not None:
             levels = kwargs['levels']
                 
-        populator = service.Populator()
+        populator = services.Populator()
         populator.run(steamid, levels)
