@@ -16,14 +16,15 @@
                     <td>Icon</td>
                     <td>
                         <ul>
-                            <li><img src="{{ object.icon }}" alt=""></li>
+                            <li>
+                                <img src="{{ object.icon }}" alt="">
+                            </li>
                             <li>
                                 <img src="http://media.steampowered.com/steamcommunity/public/images/apps/{{ object.appid }}/{{ object.icon_url }}.jpg"
                                      alt="">
                             </li>
                             <li>
                                 <a href="http://media.steampowered.com/steamcommunity/public/images/apps/{{ object.appid }}/{{ object.icon_url }}.jpg">http://media.steampowered.com/steamcommunity/public/images/apps/{{ object.appid }}/{{ object.icon_url }}.jpg</a>
-
                             </li>
                         </ul>
                     </td>
@@ -32,38 +33,130 @@
                     <td>Logo</td>
                     <td>
                         <ul>
-                            <li><img src="{{ object.logo }}" alt=""></li>
-                            <li><img src="http://media.steampowered.com/steamcommunity/public/images/apps/{{ object.appid }}/{{ object.logo_url }}.jpg"
-                                alt=""></li>
-                            <li><a href="http://media.steampowered.com/steamcommunity/public/images/apps/{{ object.appid }}/{{ object.logo_url }}.jpg">http://media.steampowered.com/steamcommunity/public/images/apps/{{ object.appid }}/{{ object.logo_url }}.jpg</li>
+                            <li>
+                                <img src="{{ object.logo }}" alt="">
+                            </li>
+                            <li>
+                                <img src="http://media.steampowered.com/steamcommunity/public/images/apps/{{ object.appid }}/{{ object.logo_url }}.jpg"
+                                     alt="">
+                            </li>
+                            <li>
+                                <a href="http://media.steampowered.com/steamcommunity/public/images/apps/{{ object.appid }}/{{ object.logo_url }}.jpg">http://media.steampowered.com/steamcommunity/public/images/apps/{{ object.appid }}/{{ object.logo_url }}.jpg</a>
+                            </li>
                         </ul>
-                    
-                    
-                        
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>About the game</td>
-                        <td>{{ object.about_the_game }}</td>
-                    </tr>
-                    <tr>
-                        <td>Short Description</td>
-                        <td>{{ object.short_description }}</td>
-                    </tr>
-                    <tr>
-                        <td>Detailed Description</td>
-                        <td>{{ object.detailed_description }}</td>
-                    </tr>
-                    <tr>
-                        <td>Created At</td>
-                        <td>{{ object.created_at }}</td>
-                    </tr>
-                    <tr>
-                        <td>Updated At</td>
-                        <td>{{ object.updated_at }}</td>
-                    </tr>
+                    </td>
                 </tr>
-            </table>
-        </div>
-    </section>
+                <tr>
+                    <td>Header</td>
+                    <td>
+                        <ul>
+                            <li>
+                                <img src="{{ object.header }}" alt="">
+                            </li>
+                            <li>
+                                <img src="{{ object.header_url }}"
+                                     alt="">
+                            </li>
+                            <li>
+                                <a href="{{ object.header_url }}">{{ object.header_url }}</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Background</td>
+                    <td>
+                        <ul>
+                            <li>
+                                <img src="{{ object.background }}" alt="">
+                            </li>
+                            <li>
+                                <img src="{{ object.background_url }}"
+                                     alt="">
+                            </li>
+                            <li>
+                                <a href="{{ object.background_url }}">{{ object.background_url }}</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>About the game</td>
+                    <td>
+                        <div class="content">{{ object.about_the_game | safe }}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Short Description</td>
+                    <td>
+                        <div class="content">{{ object.short_description | safe }}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Detailed Description</td>
+                    <td>
+                        <div class="content">{{ object.detailed_description | safe }}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Created At</td>
+                    <td>{{ object.created_at }}</td>
+                </tr>
+                <tr>
+                    <td>Updated At</td>
+                    <td>{{ object.updated_at }}</td>
+                </tr>
+                <tr>
+                    <td>Logo</td>
+                    <td><img src="{{ object.logo }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>Header</td>
+                    <td><img src="{{ object.header }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>Library Hero</td>
+                    <td><img src="{{ object.library_hero }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>Capsule</td>
+                    <td><img src="{{ object.capsule }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>hero_capsule</td>
+                    <td><img src="{{ object.hero_capsule }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>Capsule 231 87</td>
+                    <td><img src="{{ object.capsule_231x87 }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>Capsule 467 181</td>
+                    <td><img src="{{ object.capsule_467x181 }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>Capsule 616 353</td>
+                    <td><img src="{{ object.capsule_616x353 }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>Capsule Big</td>
+                    <td><img src="{{ object.capsule_big }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>Page Bg Generated</td>
+                    <td><img src="{{ object.page_background_generated }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>Page bg Raw</td>
+                    <td><img src="{{ object.page_background_raw }}" alt=""></td>
+                </tr>
+                <tr>
+                    <td>Page Bg Generated Big Picture</td>
+                    <td><img src="{{ object.page_background_generated_big_picture }}" alt=""></td>
+                </tr>
+                
+            </tr>
+        </table>
+    </div>
+</section>
 {% endblock content %}

@@ -13,6 +13,7 @@
       <td><img src="{{friend.avatar}}" alt="{{friend.personaname}} avatar"></td>
       <td>{{friend.steamid}}</td>
       <td>{{friend.personaname}}</td>
+      <td><a href="{% url 'steambro:steamuser-detail' pk=friend.id %}">View</a></td>
     </tr>
   {% endfor %}
 </table>

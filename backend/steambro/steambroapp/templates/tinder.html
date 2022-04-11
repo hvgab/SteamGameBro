@@ -3,51 +3,37 @@
 {% block content %}
 
 
-    <section class="hero is-primary">
-        <div class="hero-body">
-            <div class="container">
-                <p class="title">
-                    Tinder for your game library
-                </p>
-                <p class="subtitle">
-                    Hero subtitle
-                </p>
-            </div>
-        </div>
-    </section>
-
-
-    <section class="section">
+    <section class="section" style="background-image: linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.25)), url({{game_api_info.background_raw|safe}}); background-size: cover;">
         <div class="container">
             
-            <h1 class="title">Are you ever gonna play this game again?</h1>
+            <h1 class="title has-text-light">Are you ever gonna play this game again?</h1>
             
             <div class="columns is-centered">
-                <div class="column is-half">        
-                    <div class="card">
-                        <div class="card-image">
-                            <figure class="image">
-                                <img class="img" src="http://media.steampowered.com/steamcommunity/public/images/apps/{{game.appid}}/{{game.logo_url}}.jpg" alt="">
-                            </figure>
-                        </div>
-                        <div class="card-content">
-                            <h1 class="title">{{ game.name }}</h1>
-                        </div>
-                        <div class="card-footer">
-                            <div class="card-footer-item">
-                                <a href="#" class="">#</a>
+                <div class="column is-12">        
+                    <div class="box" style="background-color: rgba(255,255,255,.75);">
+                        <div class="columns">
+                            <div class="column is-4">
+                                <figure class="image">
+                                    <img class="img" src="{{ game.capsule }}" alt="">
+                                </figure>
                             </div>
-                            <div class="card-footer-item">
-                                <a href="{% url 'steambro:steamgame-detail' pk=game.pk %}" class="">View</a>
+                            <div class="column is-6">
+                                <div class="content">
+                                    <h1 class="title"><img src="{{ game.get_icon_url }}" alt="game icon"> {{ game.name }}</h1>
+                                    {% comment %} <p>{{ game.short_description }}</p> {% endcomment %}
+                                    <p>{{ game.about_the_game | safe }}</p>
+                                </div>
+                                <div class="buttons">
+                                    <a href="{{ game.steam_store }}" class="button">Steam Store Page -></a>
+                                    <a href="{{ game_api_info.website }}" class="button">Website</a>
+                                    <a href="{% url 'steambro:steamgame-detail' pk=game.pk %}" class="button">Game Details</a>
+                                </div>
                             </div>
-                            <div class="card-footer-item">
-                                <a href="#" class="">#</a>
+                            <div class="column is-2">
                             </div>
+
                         </div>
-                        
                     </div>
-                    
-                    
                 </div>
             </div>
 
@@ -63,6 +49,19 @@
                 </div>
             </div>
 
+        </div>
+    </section>
+    
+    <section class="section">
+        <div class="container">
+            <p class="title">
+                Tinder for your game library
+            </p>
+            <p class="subtitle">
+                {{ categorized_games_count }} categorized games
+                <br>
+                {{ uncategorized_games_count }} uncategorized games
+            </p>
             <p>This page has keyboard shortcuts!</p>
             <p><code>A</code> or <code>ArrowLeft</code> = NO</p>
             <p><code>D</code> or <code>ArrowRight</code> = YES</p>

@@ -25,7 +25,7 @@ class SteamUserAdmin(admin.ModelAdmin):
 
 @admin.register(SteamGame)
 class SteamGameAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['id', 'appid', 'name']
 
 @admin.register(Friendship)
 class SteamFriendshipAdmin(admin.ModelAdmin):

@@ -3,20 +3,23 @@
 {% block content %}
 
 <section class="section">
-    
-    <table class="table">
-        <tr>
-            <th>Steam ID</th>
-            <td>{{object.steamid}}</td>
-        </tr>
-        <tr>
-            <th>Persona Name</th>
-            <td>{{object.personaname}}</td>
-        </tr>
-    </table>
-</section>
+    <div class="container">
 
+        <table class="table">
+            <tr>
+                <th>Steam ID</th>
+                <td>{{object.steamid}}</td>
+            </tr>
+            <tr>
+                <th>Persona Name</th>
+                <td>{{object.personaname}}</td>
+            </tr>
+        </table>
+    </div>
+    </section>
+    
 <section class="section">
+    <div class="container">
     <h1 class="title">Friends</h1>
     <table class="table">
         <tr>
@@ -38,9 +41,12 @@
         </tr>
         {% endfor %}
     </table>
+</div>
 </section>
 
 <section class="section">
+    <div class="container">
+
     <h1 class="title">Friendships</h1>
     <table class="table">
         {% for friend in object.get_friendships.all %}
@@ -56,6 +62,7 @@
         </tr>
         {% endfor %}
     </table>
+</div>
 </section>
 
 

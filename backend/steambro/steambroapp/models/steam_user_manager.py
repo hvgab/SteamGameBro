@@ -3,7 +3,7 @@ from .. import services
 from ..models import SteamUser
 
 class SteamUserManager(models.Manager):
-    from steambroapp import service
+    
     def get_or_api(self, steamid):
         try:
             return super().get_queryset().get(steamid=steamid)

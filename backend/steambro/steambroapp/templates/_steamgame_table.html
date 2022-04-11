@@ -7,30 +7,28 @@
       <td>Icon</td>
       <td>Logo</td>
       <td>Title</td>
-      <td>About the game</td>
       <td>Short Description</td>
-      <td>Detailed Description</td>
+      {% comment %} <td>About the game</td> {% endcomment %}
+      {% comment %} <td>Detailed Description</td> {% endcomment %}
       <td>Created At</td>
       <td>Updated At</td>
       <td></td>
     </thead>
     {% for game in steamgame_list %}
-      <tr>
+      <tr style="background-image: linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,.9)), url({{game.library_hero}});">
         <td>{{game.appid}}</td>
         <td>
-          <img src="{{ game.icon }}" alt="">
-          <img src="http://media.steampowered.com/steamcommunity/public/images/apps/{{game.appid}}/{{game.icon_url}}.jpg" alt="">
-          {% comment %} <a href="http://media.steampowered.com/steamcommunity/public/images/apps/{{game.appid}}/{{game.icon_url}}.jpg">http://media.steampowered.com/steamcommunity/public/images/apps/{{game.appid}}/{{game.icon_url}}.jpg</a> {% endcomment %}
+          <figure class="image">
+            <img class="img" src="{{ game.get_icon_url }}" alt="">
+          </figure>
         </td>
         <td>
-          <img src="{{ game.logo }}" alt="">
-          <img src="http://media.steampowered.com/steamcommunity/public/images/apps/{{game.appid}}/{{game.logo_url}}.jpg" alt="">
-          {% comment %} <a href="http://media.steampowered.com/steamcommunity/public/images/apps/{{game.appid}}/{{game.logo_url}}.jpg">http://media.steampowered.com/steamcommunity/public/images/apps/{{game.appid}}/{{game.logo_url}}.jpg {% endcomment %}
+          <img src="{{ game.header }}" alt="">
           </td>
           <td>{{game.name}}</td>
-          <td>{{ game.about_the_game|default:"" }}</td>
           <td>{{ game.short_description|default:"" }}</td>
-          <td>{{ game.detailed_description|default:"" }}</td>
+          {% comment %} <td>{{ game.about_the_game|default:"" }}</td> {% endcomment %}
+          {% comment %} <td>{{ game.detailed_description|default:"" }}</td> {% endcomment %}
           <td>{{ game.created_at }}</td>
           <td>{{ game.updated_at }}</td>
         <td><a href="{% url 'steambro:steamgame-detail' pk=game.pk %}">View</a></td>

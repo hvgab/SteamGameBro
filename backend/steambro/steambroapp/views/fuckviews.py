@@ -66,7 +66,7 @@ class UserGameListView(View):
         appID_list_DB = [game.appid for game in all_games_DB]
         print(f'appID_list_DB: {appID_list_DB}')
 
-        user = SteamUser.get(steamid=steamid)
+        user = SteamUser.objects.get(steamid=steamid)
         user_owns = user.games
 
         # Create cache or games not in DB.
@@ -87,8 +87,8 @@ class UserGameListView(View):
                 log.debug(f'game {game["name"]} already in db')
 
             # add as owned
-            if game['appid'] not in user.games:
-                game_ = SteamGame.get(appid=game['appid'])
+            if game['appid'] not in user.games.all():
+                game_ = SteamGame.objects.get(appid=game['appid'])
                 user.games.add(game_)
                 
 
