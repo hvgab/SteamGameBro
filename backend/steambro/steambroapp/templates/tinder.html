@@ -131,7 +131,7 @@
         function sendPost(group){
             $.ajax({
                 type: "POST",
-                url: 'http://localhost:8000/api/user-game-group/',
+                url: '/api/user-game-group/',
                 data: { 
                     user: {{ request.user.id }}, 
                     game: {{ game.id }}, 

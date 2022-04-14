@@ -9,7 +9,13 @@ class SteamGameSerializer(serializers.ModelSerializer):
 class SteamUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SteamUser
-        fields = '__all__'
+        fields = [
+            'id',
+            'steamid',
+            'personaname',
+            'avatar',
+            'friendships',
+        ]
 
 class UserGameGroupSerializer(serializers.ModelSerializer):
     class Meta:

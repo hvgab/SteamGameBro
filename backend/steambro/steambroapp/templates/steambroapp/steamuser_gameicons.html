@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load dev_tags %}
+{% block content %}
+
+    <div class="hero is-primary">
+        <div class="hero-body">
+            <h1 class="title has-text-centered">{{ user.steamuser.name }} Wall</h1>
+        </div>
+    </div>
+    
+    <section class="section has-text-centered">
+        {% comment %} <div class="container"> {% endcomment %}
+            {% for game in steamgame_list %}
+            <a href="{% url 'steambro:steamgame-detail' pk=game.id %}">
+                <img src="{{ game.capsule }}" alt="{{game.name}} icon" class="img" style="width:calc(300px*0.3); height:calc(450px*0.3);" onerror="this.style.display='none';">
+            </a>
+            {% endfor %}
+        {% comment %} </div> {% endcomment %}
+    </section>
+
+    <section class="section has-text-centered">
+        {% comment %} <div class="container"> {% endcomment %}
+            {% for game in steamgame_list %}
+            <a href="{% url 'steambro:steamgame-detail' pk=game.id %}">
+                <img src="{{ game.capsule_231x87 }}" alt="{{game.name}} icon" class="img" style="width:calc(231px*0.5); height:calc(87px*0.5);" onerror="this.style.display='none';">
+            </a>
+            {% endfor %}
+        {% comment %} </div> {% endcomment %}
+    </section>
+
+    <section class="section">
+        {% comment %} <div class="container"> {% endcomment %}
+            {% for game in steamgame_list %}
+            {% comment %} <figure class="image is-48x48 is-inline-flex"> {% endcomment %}
+                <a href="{% url 'steambro:steamgame-detail' pk=game.id %}">
+                    <img src="{{ game.get_icon_url }}" alt="{{game.name}} icon" class="img" onerror="this.style.display='none';">
+                </a>
+            {% comment %} </figure> {% endcomment %}
+            {% endfor %}
+        {% comment %} </div> {% endcomment %}
+    </section>
+
+{% endblock content %}

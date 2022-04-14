@@ -209,8 +209,9 @@ class SteamUser(models.Model):
 
         try:
             r.raise_for_status()
-        except requests.exceptions.HTTPError:
+        except requests.exceptions.HTTPError as e:
             logger.error(f'Request error on get_steam_friends for {self.steamid}')
+            logger.error(e)
             return
 
         # should we remove all friends here to remove old friendships?
@@ -271,7 +272,7 @@ class SteamUser(models.Model):
                 app, created = SteamGame.objects.update_or_create(appid=game['appid'], defaults=dict(
                             name = game['name'],
                             icon_url = game['img_icon_url'],
-                            logo_url = game['img_logo_url']
+                            # logo_url = game['img_logo_url']
                 ))
                 # logger.debug(f'{created=}')
                 # logger.debug('app')

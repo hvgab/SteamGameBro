@@ -10,12 +10,15 @@ import logging
 log = logging.getLogger(__name__)
 
 # Create your views here.
-class SteamGameListView(ListView):
+class SteamUserGameIconsView(ListView):
     model = SteamGame
-    paginate_by = 10
+    template_name = 'steambroapp/steamuser_gameicons.html'
 
     def get_queryset(self):
-        return super().get_queryset()
+        user = self.request.user
+        steam_user = SteamUser.objects.get(steamid=user.steamid)
+        games = steam_user.games.all()
+        return games
 
-class SteamGameDetailView(DetailView):
-    model = SteamGame
+
+

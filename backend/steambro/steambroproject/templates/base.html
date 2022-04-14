@@ -25,12 +25,15 @@
                 <div id="navbarBasicExample" class="navbar-menu is-active">
                     <!-- NAV MENU START -->
                     <div class="navbar-start">
+                        {% if request.user.is_authenticated %}
                         <a class="navbar-item" href="{% url 'steambroapp:steamuser-list' %}">SteamUsers</a>
                         <a class="navbar-item" href="{% url 'steambroapp:steamgame-list' %}">SteamGames</a>
                         <a class="navbar-item" href="{% url 'steambroapp:tinder' %}">Tinder</a>
+                        <a class="navbar-item" href="{% url 'steambroapp:steamuser-gameicons' user.id %}">Game Wall</a>
                         <a class="navbar-item" href="{% url 'steambroapp:couch_home' %}">Couch</a>
                         <a class="navbar-item" href="{% url 'steambroapp:usergamelist' %}">UserGameList</a>
                         <a class="navbar-item" href="{% url 'steambroapp:userfriendlist' %}">UserFriendList</a>
+                        {% endif %}
                     </div>
                     <!-- NAV MENU END -->
                     <div class="navbar-end">

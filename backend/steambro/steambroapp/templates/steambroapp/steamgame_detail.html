@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 {% load dev_tags %}
 {% block content %}
+    <div class="hero" style="background-image: linear-gradient(rgba(255,255,255,.0), rgba(255,255,255,.0)), url({{ object.library_hero }}); background-size: cover; background-repeat: space;">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <img src="{{ object.logo }}" alt="" class="img">
+            </div>
+        </div>
+    </div>
+    <section class="section">
+        <div class="container"></div>
+    </section>
     <section class="section">
         <div class="container">
             <table class="table">
@@ -54,8 +64,7 @@
                                 <img src="{{ object.header }}" alt="">
                             </li>
                             <li>
-                                <img src="{{ object.header_url }}"
-                                     alt="">
+                                <img src="{{ object.header_url }}" alt="">
                             </li>
                             <li>
                                 <a href="{{ object.header_url }}">{{ object.header_url }}</a>
@@ -71,8 +80,7 @@
                                 <img src="{{ object.background }}" alt="">
                             </li>
                             <li>
-                                <img src="{{ object.background_url }}"
-                                     alt="">
+                                <img src="{{ object.background_url }}" alt="">
                             </li>
                             <li>
                                 <a href="{{ object.background_url }}">{{ object.background_url }}</a>
@@ -108,53 +116,96 @@
                 </tr>
                 <tr>
                     <td>Logo</td>
-                    <td><img src="{{ object.logo }}" alt=""></td>
+                    <td>
+                        <img src="{{ object.logo }}" alt="">
+                    </td>
                 </tr>
                 <tr>
                     <td>Header</td>
-                    <td><img src="{{ object.header }}" alt=""></td>
+                    <td>
+                        <img src="{{ object.header }}" alt="">
+                    </td>
                 </tr>
                 <tr>
-                    <td>Library Hero</td>
-                    <td><img src="{{ object.library_hero }}" alt=""></td>
+                    <td>
+                        Library Hero
+                    </td>
+                    <td>
+                        <img src="{{ object.library_hero }}" alt="">
+                    </td>
                 </tr>
                 <tr>
-                    <td>Capsule</td>
-                    <td><img src="{{ object.capsule }}" alt=""></td>
+                    <td>
+                        Capsule
+                    </td>
+                    <td>
+                        <img src="{{ object.capsule }}" alt="">
+                    </td>
                 </tr>
                 <tr>
-                    <td>hero_capsule</td>
-                    <td><img src="{{ object.hero_capsule }}" alt=""></td>
+                    <td>
+                        hero_capsule
+                    </td>
+                    <td>
+                        <img src="{{ object.hero_capsule }}" alt="">
+                    </td>
                 </tr>
                 <tr>
-                    <td>Capsule 231 87</td>
-                    <td><img src="{{ object.capsule_231x87 }}" alt=""></td>
+                    <td>
+                        Capsule 231 87
+                    </td>
+                    <td>
+                        <img src="{{ object.capsule_231x87 }}" alt="">
+                    </td>
                 </tr>
                 <tr>
-                    <td>Capsule 467 181</td>
-                    <td><img src="{{ object.capsule_467x181 }}" alt=""></td>
+                    <td>
+                        Capsule 467 181
+                    </td>
+                    <td>
+                        <img src="{{ object.capsule_467x181 }}" alt="">
+                    </td>
                 </tr>
                 <tr>
-                    <td>Capsule 616 353</td>
-                    <td><img src="{{ object.capsule_616x353 }}" alt=""></td>
+                    <td>
+                        Capsule 616 353
+                    </td>
+                    <td>
+                        <img src="{{ object.capsule_616x353 }}" alt="">
+                    </td>
                 </tr>
                 <tr>
-                    <td>Capsule Big</td>
-                    <td><img src="{{ object.capsule_big }}" alt=""></td>
+                    <td>
+                        Capsule Big
+                    </td>
+                    <td>
+                        <img src="{{ object.capsule_big }}" alt="">
+                    </td>
                 </tr>
                 <tr>
-                    <td>Page Bg Generated</td>
-                    <td><img src="{{ object.page_background_generated }}" alt=""></td>
+                    <td>
+                        Page Bg Generated
+                    </td>
+                    <td>
+                        <img src="{{ object.page_background_generated }}" alt="">
+                    </td>
                 </tr>
                 <tr>
-                    <td>Page bg Raw</td>
-                    <td><img src="{{ object.page_background_raw }}" alt=""></td>
+                    <td>
+                        Page bg Raw
+                    </td>
+                    <td>
+                        <img src="{{ object.page_background_raw }}" alt="">
+                    </td>
                 </tr>
                 <tr>
-                    <td>Page Bg Generated Big Picture</td>
-                    <td><img src="{{ object.page_background_generated_big_picture }}" alt=""></td>
+                    <td>
+                        Page Bg Generated Big Picture
+                    </td>
+                    <td>
+                        <img src="{{ object.page_background_generated_big_picture }}" alt="">
+                    </td>
                 </tr>
-                
             </tr>
         </table>
     </div>

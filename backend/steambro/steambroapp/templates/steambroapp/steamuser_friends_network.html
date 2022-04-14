@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load dev_tags %}
+{% load static %}
+{% block content %}
+
+    <div class="hero is-primary">
+        <div class="hero-body">
+            <h1 class="title has-text-centered">{{ steam_user.id }} {{ steam_user.personaname }} Friends</h1>
+            <h1 class="subtitle has-text-centered">{{ steam_user.steamid }}</h1>
+        </div>
+    </div>
+
+    <div class="section">
+        <h1 class="title">Network Visualization</h1>
+        <div class="box">
+            <div id="demo-canvas" style="height: 720px;"></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <pre><code>{{ steamuser_list }}</code></pre>
+    </div>
+    <div class="section">
+        <pre><code>{{ friends }}</code></pre>
+    </div>
+    <div class="section">
+        <pre><code>{{ steam_user }}</code></pre>
+    </div>
+    <div class="section">
+        <pre><code>{{ friends_json }}</code></pre>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script>
+        // JavaScript function to get cookie by name; retrieved from https://docs.djangoproject.com/en/3.1/ref/csrf/
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    <script src="{% static 'steambroapp/jsnetworkx.js' %}"></script>
+    {{ steam_user_json | json_script:"steam_user" }}
+    {{ friends_json | json_script:"friends" }}
+    <script>
+        
+        // var steam_user_id = {{ steam_user.id }};
+        var steam_user = JSON.parse(document.getElementById('steam_user').textContent);
+        console.log('steam_user')
+        console.log(steam_user)
+        
+        var friends = JSON.parse(document.getElementById('friends').textContent);
+        console.log('friends')
+        console.log(friends)
+
+        var G = new jsnx.Graph();
+        //console.log('Adding Root User');
+        //G.addNode(steam_user.id, {steam_user});
+
+        console.log('Adding friends of Root User')
+        for (friend of friends) {
+            if (friend.id !== steam_user.id) {
+                G.addNode(friend['id'], friend);
+                // G.addEdge(steam_user.id, friend['id']);
+            }
+        }
+        console.log('Finished adding friend nodes and edges');
+
+        console.log('G.nodes')
+        console.log(G.nodes())
+        console.log([G.nodes()])
+
+        //console.log('Adding edges between friends.');
+        // add friendships between friends
+        for (friend of friends){
+            console.log('Adding fffs of '+friend.personaname);
+            for (ff_id of friend.friends) {
+                /*
+                console.log('ff_id '+ff_id)
+                console.log('g.nodes includes ff_id '+ff_id);
+                console.log([G.nodes()].includes(ff_id));
+                console.log('ff_id '+ff_id+' != steam_user.id '+steam_user.id);
+                console.log(ff_id != steam_user.id);
+                */
+                
+                console.log(ff_id+' is already node? '+G.nodes().indexOf(ff_id)>0);
+                console.log(ff_id+' is not steam_user_id '+steam_user.id+'? '+ff_id!=steam_user.id);
+
+                if (G.nodes().indexOf(ff_id)>0 && ff_id != steam_user.id){
+                    G.addEdge(friend.id, ff_id);
+                }
+            }
+        }
+        console.log('Finished adding ff edges');
+
+        
+        console.log('find cliques');
+        var cliques = jsnx.findCliques(G);
+        console.log('cliques found');
+        console.log(cliques);
+        
+
+        var color = d3.scale.category20();
+
+        for (clq of cliques){
+            console.log(clq);
+            console.log(clq.toString());
+            if (clq.length == 2) {
+                G.addNodesFrom(clq, {color: color(clq[0].toString())});
+            } else if (clq.length > 2) {
+                G.addNodesFrom(clq, {color: color(clq.toString())});
+            }
+        }
+
+        console.log('Drawing Canvas');
+        jsnx.draw(G, {
+            element: '#demo-canvas',
+            stickyDrag: true,
+            withLabels: true,
+            weighted: true,
+            layoutAttr: {
+                charge: -5000,
+                linkDistance: 20,
+                size: [1900, 640]
+            },
+            nodeAttr: {
+                r: function(d) {
+                // `d` has the properties `node`, `data` and `G`
+                return G.degree(d.node)/2+20;
+                },
+            },
+            // labels: 'personaname',
+            labels: 'label',
+            nodeStyle: {
+                stroke: 'none',
+                fill: function(d) {
+                    return d.data.color || '#AAA'
+                }
+            },
+            edgeStyle: {
+                fill: '#999'
+            },
+        });
+    </script>
+
+{% endblock content %}
