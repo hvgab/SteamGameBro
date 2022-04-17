@@ -17,6 +17,8 @@ djangorestframework = "*"
 django-cors-headers = "*"
 docutils = "*"
 django-service-objects = "*"
+xmltodict = "*"
+progress = "*"
 
 [dev-packages]
 

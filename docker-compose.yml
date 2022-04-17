@@ -11,6 +11,9 @@ services:
             - ./backend:/app
         depends_on: 
             - db
+        environment:
+            PYTHONUNBUFFERED: 1
+            PYTHONDONTWRITEBYTECODE: 1
     
     # frontend:
     #     build: "frontend"

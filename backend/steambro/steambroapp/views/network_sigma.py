@@ -8,6 +8,7 @@ from ..models import SteamGame
 from pprint import pprint, pformat
 import json
 import logging
+import random
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ class NetworkSigmaView(TemplateView):
         # log.debug(pformat(friendships))
 
         log.debug('getting friendships')
-        friendships = Friendship.objects.order_by('id').all()[:50]
+        friendships = Friendship.objects.order_by('id').all()[:10000]
         # log.debug(pformat(friendships))  
 
         from_friendship_user_ids = friendships.values_list('from_steamuser_id', flat=True)
@@ -48,8 +49,8 @@ class NetworkSigmaView(TemplateView):
                     'id': user.id, 
                     'steam_id': user.steamid, 
                     'name': user.personaname, 
-                    'x': 0,
-                    'y': 0, 
+                    'x': random.random(),
+                    'y': random.random(), 
                     'size': 5,
                     'label': f'{user.id}-{user.personaname}',
                     'color': "blue",
@@ -60,7 +61,7 @@ class NetworkSigmaView(TemplateView):
         log.debug('making friendship list')
         friendship_list = []
         for f in friendships:
-            friendship_list.append({'from': f.from_steamuser.id, 'to': f.to_steamuser.id})
+            friendship_list.append({'from': f.from_steamuser_id, 'to': f.to_steamuser_id})
         # log.debug(pformat(friendship_list))
         
         log.debug('adding to context')

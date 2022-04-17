@@ -14,6 +14,51 @@
                 <th>Persona Name</th>
                 <td>{{object.personaname}}</td>
             </tr>
+            <tr>
+                <th>profileurl profileurl</th>
+                <td>{{object.profileurl}}</td>
+            </tr>
+            <tr>
+                <th>avatarhash</th>
+                <td>{{object.avatarhash}}</td>
+            </tr>
+            <tr>
+                <th>avatar</th>
+                <td>
+                    {{object.avatar}}
+                    <img src="{{object.avatar}}" alt="" class="img">
+                </td>
+            </tr>
+            <tr>
+                <th>avatarmedium</th>
+                <td>
+                    {{object.avatarmedium}}
+                    <img src="{{object.avatarmedium}}" alt="" class="img">
+                </td>
+            </tr>
+            <tr>
+                <th>avatarfull</th>
+                <td>
+                    {{object.avatarfull}}
+                    <img src="{{object.avatarfull}}" alt="" class="img">
+                </td>
+            </tr>
+            <tr>
+                <th>personastate</th>
+                <td>{{object.personastate}}</td>
+            </tr>
+            <tr>
+                <th>communityvisibilitystate</th>
+                <td>{{object.communityvisibilitystate}}</td>
+            </tr>
+            <tr>
+                <th>realname</th>
+                <td>{{object.realname}}</td>
+            </tr>
+            <tr>
+                <th>primaryclanid</th>
+                <td>{{object.primaryclanid}}</td>
+            </tr>
         </table>
     </div>
     </section>
@@ -25,12 +70,21 @@
         <tr>
             <td>friend.steamid</td>
             <td>friend.personaname</td>
-            <td>friend.personaname</td>
+            <td>friend.profileurl</td>
+            <td>avatarhash</td>
+            <td>Actions</td>
+            <td>Actions</td>
+            <td>Actions</td>
             <td>Actions</td>
         </tr>
         {% for friend in object.friendships.all %}
         <tr>
             <td>{{friend.steamid}}</td>
+            <td>{{friend.personaname}}</td>
+            <td>{{friend.profileurl}}</td>
+            <td>{{friend.personaname}}</td>
+            <td>{{friend.personaname}}</td>
+            <td>{{friend.personaname}}</td>
             <td>{{friend.personaname}}</td>
             <td>{{friend.personaname}}</td>
             <td>

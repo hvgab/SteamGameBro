@@ -1,0 +1,587 @@
+{% extends 'base.html' %}
+{% load dev_tags %}
+{% load static %}
+{% block content %}
+    <div class="hero is-primary">
+        <div class="hero-body">
+            <h1 class="title has-text-centered">{{ steam_user.id }} {{ steam_user.personaname }} Friends</h1>
+            <h1 class="subtitle has-text-centered">{{ steam_user.steamid }}</h1>
+        </div>
+    </div>
+    <div class="section">
+        <h1 class="title">Network Visualization</h1>
+        <div class="box">
+            <div id="demo-canvas" style="height: 720px;"></div>
+            <div id="search">
+                <input type="search"
+                       id="search-input"
+                       list="suggestions"
+                       placeholder="Try searching for a node..."/>
+                <datalist id="suggestions"></datalist>
+            </div>
+            <div id="buttons">
+                <button id="random" class="button">
+                    <span class="icon">
+                        <img src="{% static 'steambroapp/noun-dice-4315661.svg' %}" />
+                    </span>
+                    <span>random</span>
+                </button>
+                <button id="forceatlas2" class="button">
+                    <span class="icon">
+                        <img id="forceatlas2-start-label"
+                             class="img"
+                             src="{% static 'steambroapp/noun-atlas-3863916.svg' %}"/>
+                        <img id="forceatlas2-stop-label"
+                             class="img"
+                             style="display: none"
+                             src="{% static 'steambroapp/noun-atlas-3863916.svg' %}"/>
+                    </span>
+                    <span>Force Atlas 2</span>
+                </button>
+                <button id="circular" class="button">
+                    <span class="icon">
+                        <img src="{% static 'steambroapp/noun-circle-200124.svg' %}" />
+                    </span>
+                    <span>circular</span>
+                </button>
+                <button id="circlepack" class="button">
+                    <span class="icon">
+                        <img src="{% static 'steambroapp/noun-circles-3459120.svg' %}" />
+                    </span>
+                    <span>circlepack Community</span>
+                </button>
+                <button id="circlepackPrimaryClan" class="button">
+                    <span class="icon">
+                        <img src="{% static 'steambroapp/noun-circles-3459120.svg' %}" />
+                    </span>
+                    <span>circlepack PrimaryClan</span>
+                </button>
+            </div>
+        </div>
+        <div>
+            <h2>Palette</h2>
+            <div id="palette"></div>
+        </div>
+    </div>
+    <div class="section">
+        <pre><code>{{ friends }}</code></pre>
+    </div>
+    <div class="section">
+        <pre><code>{{ friendships }}</code></pre>
+    </div>
+    <section class="section">
+        <table id="nodeTable" class="table">
+            <thead>
+                <th>ID</th>
+                <th>Label</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th>Community</th>
+                <th>PrimaryClan</th>
+            </thead>
+        </table>
+    </section>
+    <section class="section">
+        <p>
+            Random by Nithinan Tatah from NounProject.com
+        </p>
+        <p>
+            Atlas by Andrejs Kirma from NounProject.com
+        </p>
+        <p>
+            Circles by Wenjie from NounProject.com
+        </p>
+        <p>
+            Circle by Magicon from NounProject.com
+        </p>
+        <p>Dice by Alex Burte from NounProject.com</p>
+    </section>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="{% static 'steambroapp/graphology.min.js' %}"></script>
+    <script src="{% static 'steambroapp/graphology-library.min.js' %}"></script>
+    <script src="{% static 'steambroapp/sigma.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.4.4/d3.min.js" integrity="sha512-hnFpvCiJ8Fr1lYLqcw6wLgFUOEZ89kWCkO+cEekwcWPIPKyknKV1eZmSSG3UxXfsSuf+z/SgmiYB1zFOg3l2UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js" integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // JavaScript function to get cookie by name; retrieved from https://docs.djangoproject.com/en/3.1/ref/csrf/
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    {{ friends | json_script:"users" }}
+    {{ friendships | json_script:"friendships" }}
+    <script>
+        /* Search button */
+        const searchInput = document.getElementById("search-input");
+        const searchSuggestions = document.getElementById("suggestions");
+        /* Layout Buttons */
+        const FA2Button = document.getElementById("forceatlas2")
+        const FA2StopLabel = document.getElementById("forceatlas2-stop-label")
+        const FA2StartLabel = document.getElementById("forceatlas2-start-label")
+
+        const randomButton = document.getElementById("random")
+
+        const circularButton = document.getElementById("circular")
+        const circlepackButton = document.getElementById("circlepack")
+        const circlepackPrimaryClanButton = document.getElementById("circlepackPrimaryClan")
+
+
+        /** Library Shortcuts **/
+        var FA2Layout = graphologyLibrary.FA2Layout;
+        var forceAtlas2 = graphologyLibrary.layoutForceAtlas2;
+        var circular = graphologyLibrary.layout.circular;
+        var circlepack = graphologyLibrary.layout.circlepack;
+        var random = graphologyLibrary.layout.random;
+        /**
+
+        NODES
+
+        **/
+        var users = JSON.parse(document.getElementById('users').textContent);
+        console.log('users')
+        console.log(users)
+        /**
+        
+        EDGES
+
+        **/
+        var friendships = JSON.parse(document.getElementById('friendships').textContent);
+        console.log('friendships')
+        console.log(friendships)
+
+        /*
+        
+        GRAPH INIT
+
+        */
+        var container = document.getElementById("demo-canvas")
+        var graph = new graphology.Graph();
+        /** Add Nodes **/
+        console.log('Adding Nodes')
+        for (user of users) {
+            console.log(`Adding node: ${user}`)
+            graph.addNode(user.id, user);
+        }
+        console.log('Finished adding nodes');
+        /** Add Edges **/
+        console.log('Adding Edges')
+        for (fs of friendships){
+            try {
+                graph.addEdge(fs.source, fs.target);
+            } catch (error) {
+                if (error.name == 'UsageGraphError') {
+                } else {
+                    console.error(error);
+                }
+            }
+        }
+        console.log('Finished adding edges');
+        
+        graph = graphologyLibrary.operators.toUndirected(graph);
+
+        /**
+        
+        Communities
+
+        **/
+        communityDetails = graphologyLibrary.communitiesLouvain.detailed(graph);
+        console.log(communityDetails);
+
+        graphologyLibrary.communitiesLouvain.assign(graph);
+
+        var communities = communityDetails.communities;
+        console.log(communities);
+
+        console.log('comm values');
+        console.log(Object.values(communities));
+
+        var commValues = Object.values(communities);
+
+        function getUniqueVal(value, index, self) { 
+            return self.indexOf(value) === index;
+        }
+        
+        var uniqueCommunities = commValues.filter( getUniqueVal ); 
+        console.log('uniqueCommunities'); 
+        console.log(uniqueCommunities); 
+        
+        /* Community Count */
+        var communityCount = {};
+        for (c of uniqueCommunities){
+            communityCount[c] = 0;
+        }
+        for (c of commValues){
+            communityCount[c]++;
+        }
+        console.log('communityCount:')
+        console.log(communityCount);
+        
+        var colorCommunitiesCount = []
+        for (const key in communityCount){
+            console.log(`${key}: ${communityCount[key]}`)
+            if (communityCount[key] > 2){
+                colorCommunitiesCount.push(key)
+            }
+        }
+        console.log(`colorCommunitiesCount: ${colorCommunitiesCount}`)
+
+        /**
+        
+        Primary Clan
+
+        **/
+        var primaryClans = {};
+        console.log('primaryClans')
+        graph.forEachNode((node, atts) => {
+            if (node < 20) {
+                console.log(`${node}:`)
+                console.log(atts)
+            }
+            if (!primaryClans.hasOwnProperty(atts.primaryclanid)){
+                primaryClans[atts.primaryclanid] = {};
+                primaryClans[atts.primaryclanid]['id'] = atts.primaryclanid;
+                primaryClans[atts.primaryclanid]['count'] = 0;
+                primaryClans[atts.primaryclanid]['color'] = "";
+            }
+            primaryClans[atts.primaryclanid]['count'] += 1;
+        });
+        console.log('primaryClans');
+        console.log(primaryClans);
+
+        /*   
+        
+            COLORS   
+            
+        */
+        // Cubehelix
+        colors = chroma.cubehelix().scale().correctLightness().colors(colorCommunitiesCount.length)
+        // paired 12
+        colors = ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a","#ffff99","#b15928"]
+        // set 3
+        //colors = ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9","#bc80bd","#ccebc5","#ffed6f"]
+        console.log('colors');
+        console.log(colors);
+        
+        var paletteDict = {}
+        for (let i = 0; i < colorCommunitiesCount.length; i++) {
+            console.log(`colors[${i}] : ${colors[i]}`);
+            paletteDict[colorCommunitiesCount[i]] = colors[i];
+        } 
+
+        var paletteHTML = document.getElementById('palette')
+        for (color of colors) {
+            paletteHTML.innerHTML += `<span style="background-color: ${color}; border-radius: 5px; display:inline-block; width: 20px; height: 20px;"></span>&nbsp;`
+        }
+
+        console.log('paletteDict');
+        console.log(paletteDict);
+
+        
+        /*
+            
+
+        CHANGE NODE APPEARANCE
+        
+
+        */
+        graph.forEachNode((node, atts) => {
+            // Only color node if node.community is in color dict.
+            if (colorCommunitiesCount.indexOf(atts.community.toString()) > -1 ){
+                atts.color = paletteDict[atts.community];
+            }
+            // node size depends on its degree
+            // atts.size = Math.sqrt(graph.degree(node)) / 2;
+            atts.size = graph.degree(node)/3;
+            // store cluster's nodes positions to calculate cluster label position
+            // cluster.positions.push({ x: atts.x, y: atts.y });
+            // Add degree to name
+            atts.label = atts.label + ' ('+graph.degree(node)+')'
+        });
+        /*
+            
+        
+        DEFAULT NODE POSITIONS
+
+
+        */
+        graphologyLibrary.layout.circlepack.assign(graph, {
+            hierarchyAttributes: ['degree', 'community'],
+        });
+
+        /*
+        
+        INITIATE FA2
+        
+        */
+        // Graphology provides a easy to use implementation of Force Atlas 2 in a web worker
+        const sensibleSettings = forceAtlas2.inferSettings(graph)
+        var fa2Layout = new FA2Layout(graph, {
+            settings: sensibleSettings
+        });
+        /*
+        
+        RENDERER
+        
+        */
+        var renderer = new Sigma(graph, container);
+        //fa2Layout.start()
+        /*
+
+        NODES TO HTML TABLE
+        
+        */
+        var table = document.getElementById('nodeTable');
+        graph.forEachNode((node, atts) => {
+            var text = ""
+            text += `<td>${atts.id}</td>`
+            text += `<td>${atts.label}</td>`
+            text += `<td style="background-color:${atts.color};">${atts.color}</td>`
+            text += `<td>${atts.size}</td>`
+            text += `<td style="background-color:${atts.color};">${atts.community}</td>`
+            text += `<td>${atts.primaryclanid}</td>`
+            table.innerHTML += `<tr>${text}</tr>`
+        });
+        /*
+
+        LAYOUT BUTTONS
+
+        */
+        // A variable is used to toggle state between start and stop
+        let cancelCurrentAnimation = null;
+        // correlate start/stop actions with state management
+        function stopFA2() {
+            fa2Layout.stop()
+            FA2StartLabel.style.display = "flex"
+            FA2StopLabel.style.display = "none"
+        }
+        function startFA2() {
+            if (cancelCurrentAnimation) cancelCurrentAnimation()
+            fa2Layout.start()
+            FA2StartLabel.style.display = "none"
+            FA2StopLabel.style.display = "flex"
+        }
+        // the main toggle function
+        function toggleFA2Layout() {
+            if (fa2Layout.isRunning()) {
+                stopFA2()
+            } else {
+                startFA2()
+            }
+        }
+        // bind method to the forceatlas2 button
+        FA2Button.addEventListener("click", toggleFA2Layout)
+
+        /** 
+        
+        RANDOM LAYOUT 
+        
+        **/
+        /* Layout can be handled manually by setting nodes x and y attributes */
+        /* This random layout has been coded to show how to manipulate positions directly in the graph instance */
+        /* Alternatively a random layout algo exists in graphology: https://github.com/graphology/graphology-layout#random  */
+        function randomLayout() {
+        // stop fa2 if running
+        if (fa2Layout.isRunning()) stopFA2()
+        random.assign(graph);
+        }
+
+        // bind method to the random button
+        randomButton.addEventListener("click", randomLayout)
+
+        /** 
+        
+        CIRCULAR LAYOUT 
+        
+        **/
+        /* This example shows how to use an existing deterministic graphology layout */
+        function circularLayout() {
+        // stop fa2 if running
+        if (fa2Layout.isRunning()) stopFA2()
+        if (cancelCurrentAnimation) cancelCurrentAnimation()
+        const circularPositions = circular(graph, { scale: 100 })
+        //In other context, it's possible to apply the position directly we : circular.assign(graph, {scale:100})
+        /*
+        cancelCurrentAnimation = animateNodes(graph, circularPositions, {
+            duration: 2000,
+            easing: "linear"
+        })
+        */
+        circular.assign(graph, {scale:100});
+        }
+
+        // bind method to the random button
+        circularButton.addEventListener("click", circularLayout)
+
+        /** 
+        
+        CIRCLE PACK LAYOUT 
+        
+        **/
+        /* This example shows how to use an existing deterministic graphology layout */
+        function circlepackLayout() {
+            // stop fa2 if running
+            if (fa2Layout.isRunning()) stopFA2()
+            if (cancelCurrentAnimation) cancelCurrentAnimation()
+        
+            circlepack.assign(graph, {scale:100, hierarchyAttributes: ['degree', 'community'],});    
+        }
+        // bind method to the random button
+        circlepackButton.addEventListener("click", circlepackLayout)
+        /** 
+        
+        CIRCLE PACK PRIMARYCLAN LAYOUT 
+        
+        **/
+        /* This example shows how to use an existing deterministic graphology layout */
+        function circlepackPrimaryClanLayout() {
+            // stop fa2 if running
+            if (fa2Layout.isRunning()) stopFA2()
+            if (cancelCurrentAnimation) cancelCurrentAnimation()
+        
+            circlepack.assign(graph, {scale:100, hierarchyAttributes: ['primaryclanid'],});
+        }
+        // bind method to the random button
+        circlepackPrimaryClanButton.addEventListener("click", circlepackPrimaryClanLayout)
+        /**
+        
+        SIGMA ACTIONS 
+        
+        **/
+        const state = { searchQuery: ""}
+        // Feed the datalist autocomplete values:
+        searchSuggestions.innerHTML = graph.nodes().map(
+                node => `<option value="${graph.getNodeAttribute(node, "label")}"></option>`
+            )
+            .join("\n")
+        // Actions:
+        function setSearchQuery(query) {
+            state.searchQuery = query
+        
+            if (searchInput.value !== query) searchInput.value = query
+        
+            if (query) {
+                const lcQuery = query.toLowerCase()
+                const suggestions = graph
+                    .nodes()
+                    .map(n => ({ id: n, label: graph.getNodeAttribute(n, "label") }))
+                    .filter(({ label }) => label.toLowerCase().includes(lcQuery))
+            
+                // If we have a single perfect match, them we remove the suggestions, and
+                // we consider the user has selected a node through the datalist
+                // autocomplete:
+                if (suggestions.length === 1 && suggestions[0].label === query) {
+                    state.selectedNode = suggestions[0].id
+                    state.suggestions = undefined
+            
+                    // Move the camera to center it on the selected node:
+                    const nodePosition = renderer.getNodeDisplayData(state.selectedNode)
+                    renderer.getCamera().animate(nodePosition, {
+                    duration: 500
+                    })
+                }
+                // Else, we display the suggestions list:
+                else {
+                    state.selectedNode = undefined
+                    state.suggestions = new Set(suggestions.map(({ id }) => id))
+                }
+            }
+            // If the query is empty, then we reset the selectedNode / suggestions state:
+            else {
+                state.selectedNode = undefined
+                state.suggestions = undefined
+            }
+        
+            // Refresh rendering:
+            renderer.refresh()
+        }
+        function setHoveredNode(node) {
+            if (node) {
+                state.hoveredNode = node
+                state.hoveredNeighbors = new Set(graph.neighbors(node))
+            } else {
+                state.hoveredNode = undefined
+                state.hoveredNeighbors = undefined
+            }
+        
+            // Refresh rendering:
+            renderer.refresh()
+        }
+        
+        // Bind search input interactions:
+        searchInput.addEventListener("input", () => {
+            setSearchQuery(searchInput.value || "")
+        })
+        searchInput.addEventListener("blur", () => {
+            setSearchQuery("")
+        })
+        
+        // Bind graph interactions:
+        renderer.on("enterNode", ({ node }) => {
+            setHoveredNode(node)
+        })
+        renderer.on("leaveNode", () => {
+            setHoveredNode(undefined)
+        })
+
+        // Render nodes accordingly to the internal state:
+        // 1. If a node is selected, it is highlighted
+        // 2. If there is query, all non-matching nodes are greyed
+        // 3. If there is a hovered node, all non-neighbor nodes are greyed
+        renderer.setSetting("nodeReducer", (node, data) => {
+            const res = { ...data }
+        
+            if (
+                state.hoveredNeighbors &&
+                !state.hoveredNeighbors.has(node) &&
+                state.hoveredNode !== node
+            ) {
+                res.label = ""
+                res.color = "#f6f6f6"
+            }
+        
+            if (state.selectedNode === node) {
+                res.highlighted = true
+            } else if (state.suggestions && !state.suggestions.has(node)) {
+                res.label = ""
+                res.color = "#f6f6f6"
+            }
+        
+            return res
+        })
+        
+        // Render edges accordingly to the internal state:
+        // 1. If a node is hovered, the edge is hidden if it is not connected to the
+        //    node
+        // 2. If there is a query, the edge is only visible if it connects two
+        //    suggestions
+        renderer.setSetting("edgeReducer", (edge, data) => {
+            const res = { ...data }
+        
+            if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
+                res.hidden = true
+            }
+        
+            if (
+                state.suggestions &&
+                (!state.suggestions.has(graph.source(edge)) ||
+                !state.suggestions.has(graph.target(edge)))
+            ) {
+                res.hidden = true
+            }
+        
+            return res
+        })
+    </script>
+{% endblock content %}

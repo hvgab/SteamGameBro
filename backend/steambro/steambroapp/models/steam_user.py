@@ -10,6 +10,7 @@ import json
 from django.utils import timezone
 import datetime as dt
 from django.db import transaction
+from progress.bar import Bar
 
 logger = logging.getLogger(__name__)
 
@@ -128,6 +129,9 @@ class SteamUser(models.Model):
 
     # gameserversteamid
 
+    friendships_are_public = models.BooleanField(default=True)
+    friendships_updated = models.DateTimeField(blank=True, null=True)
+
 
     owned_games_list = models.CharField(
         max_length=1000000,
@@ -212,22 +216,35 @@ class SteamUser(models.Model):
         except requests.exceptions.HTTPError as e:
             logger.error(f'Request error on get_steam_friends for {self.steamid}')
             logger.error(e)
+            self.friendships_are_public = False
+            self.save()
             return
 
         # should we remove all friends here to remove old friendships?
         rj = r.json()
 
         steamid_list = []
-        for friend in rj['friendslist']['friends']:
-            friend_steamid = int(friend['steamid'])
-            steamid_list.append(friend_steamid)
-            friendObject, created = SteamUser.objects.get_or_create(steamid=friend_steamid)
-            if created is True:
-                friendObject.refresh_summary()
-                friendObject.save()
 
-            self.add_friendship(friendObject, timezone.make_aware(dt.datetime.fromtimestamp(friend['friend_since'])), friend['relationship'])
-        
+        with Bar('Adding Friendships...') as bar:
+            for friend in rj['friendslist']['friends']:
+                friend_steamid = int(friend['steamid'])
+                steamid_list.append(friend_steamid)
+                friendObject, created = SteamUser.objects.get_or_create(steamid=friend_steamid)
+                
+                # Kan ikke refreshe alle venner bare fordi man trenger freidnship updates.
+                # if created is True:
+                #     friendObject.refresh_summary()
+                #     friendObject.save()
+
+                # logger.debug('Adding Friendship')
+                self.add_friendship(friendObject, timezone.make_aware(dt.datetime.fromtimestamp(friend['friend_since'])), friend['relationship'])
+                # logger.debug('Added Friendship')
+
+                bar.next()
+
+        self.friendships_updated = timezone.now()
+        self.save()
+
         return self.get_friendships()
 
     def refresh_steam_games(self):

@@ -14,6 +14,10 @@
         <h1 class="title">Network Visualization</h1>
         <div class="box">
             <div id="demo-canvas" style="height: 720px;"></div>
+            <div id="search">
+                <input type="search" id="search-input" list="suggestions" placeholder="Try searching for a node..." />
+                <datalist id="suggestions"></datalist>
+              </div>
         </div>
     </div>
 
@@ -35,7 +39,8 @@
     <script src="{% static 'steambroapp/graphology.min.js' %}"></script>
     <script src="{% static 'steambroapp/graphology-library.min.js' %}"></script>
     <script src="{% static 'steambroapp/sigma.min.js' %}"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.4.4/d3.min.js" integrity="sha512-hnFpvCiJ8Fr1lYLqcw6wLgFUOEZ89kWCkO+cEekwcWPIPKyknKV1eZmSSG3UxXfsSuf+z/SgmiYB1zFOg3l2UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js" integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
         // JavaScript function to get cookie by name; retrieved from https://docs.djangoproject.com/en/3.1/ref/csrf/
@@ -60,6 +65,12 @@
     {{ friendships_list | json_script:"friendships" }}
     
     <script>
+        const searchInput = document.getElementById("search-input") as HTMLInputElement;
+        const searchSuggestions = document.getElementById("suggestions") as HTMLDataListElement;
+
+        var FA2Layout = graphologyLibrary.FA2Layout;
+        var forceAtlas2 = graphologyLibrary.layoutForceAtlas2;
+
         var users = JSON.parse(document.getElementById('users').textContent);
         console.log('users')
         console.log(users)
@@ -73,25 +84,94 @@
 
         console.log('Adding Nodes')
         for (user of users) {
-            console.log('user');
-            console.log(user);
-            console.log(user.id);
+            //console.log('user');
+            //console.log(user);
+            //console.log(user.id);
             graph.addNode(user.id, user);
         }
         console.log('Finished adding nodes');
         
         console.log('Adding Edges')
         for (fs of friendships){
-            console.log('fs');
-            console.log(fs);
-            graph.addEdge(fs.from, fs.to);
+            //console.log('fs');
+            //console.log(fs);
+            try {
+                graph.addEdge(fs.from, fs.to);
+            } catch (error) {
+                if (error.name == 'UsageGraphError') {
+                } else {
+                    console.error(error);
+                }
+            }
         }
         console.log('Finished adding edges');
 
+        // To directly assign communities as a node attribute
+        //communities = graphologyLibrary.communitiesLouvain(graph);
+        //console.log('Communities: ');
+        //console.log(communities);
+        communityDetails = graphologyLibrary.communitiesLouvain.detailed(graph);
+        console.log(communityDetails);
+
+        graphologyLibrary.communitiesLouvain.assign(graph);
+
+        var communities = communityDetails.communities;
+        console.log(communities);
+
+        console.log('comm values');
+        console.log(Object.values(communities));
+
+        var commValues = Object.values(communities);
+
+        function getUniqueVal(value, index, self) { 
+            return self.indexOf(value) === index;
+        }
+        
+        var uniqueCommunities = commValues.filter( getUniqueVal ); 
+        console.log('uniqueCommunities'); 
+        console.log(uniqueCommunities); 
+        
+        // colors = chroma.scale('YlGnBu').classes(uniqueCommunities.length);
+        colors = chroma.scale('YlGnBu').domain([0, uniqueCommunities.length]);
+        console.log('colors');
+        console.log(colors);
+
+        var paletteDict = {}
+        for (let i = 0; i < uniqueCommunities.length; i++) {
+            console.log('colors(i) : ' + colors(i));
+            console.log('colors(i).hex() : ' + colors(i).hex());
+            paletteDict[uniqueCommunities[i]] = colors(i).hex();
+        } 
+
+        console.log('paletteDict');
+        console.log(paletteDict);
+
+        // change node appearance
+        graph.forEachNode((node, atts) => {
+            console.log('node: '+node);
+            console.log('atts: '+atts);
+            console.log(atts.community);
+            atts.color = paletteDict[atts.community];
+            // node size depends on its degree
+            atts.size = Math.sqrt(graph.degree(node)) / 2;
+            // store cluster's nodes positions to calculate cluster label position
+            // cluster.positions.push({ x: atts.x, y: atts.y });
+        });
+
+        // create and assign one color by community
+
         // var positions = graphologyLibrary.layout.circular(graph);
-        graphologyLibrary.layout.circular.assign(graph);
+        graphologyLibrary.layout.circular.assign(graph);        
+
+        const sensibleSettings = forceAtlas2.inferSettings(graph);
+        const fa2Layout = new FA2Layout(graph, {
+            settings: sensibleSettings,
+        });
 
         var renderer = new Sigma(graph, container);
+
+        fa2Layout.start()
+        
         
     </script>
 

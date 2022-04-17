@@ -138,19 +138,40 @@ class SteamUser(object):
     def getOwnedGameImgURL(self, appid, hash):
         return f'http://media.steampowered.com/steamcommunity/public/images/apps/{appid}/{hash}.jpg'
 
+    def getUserGroupList(self):
+        url = 'https://api.steampowered.com/ISteamUser/GetUserGroupList/v1/'
+        params = {
+            'key': settings.STEAM_API_KEY,
+            'steamid': self.steamid,
+        }
+        r = requests.get(url, params=params)
+        r.raise_for_status()
+        try:
+            result = r.json()
+        except Exception as e:
+            log.debug(e)
+            log.debug(f'params: {params}')
+            log.debug(r.text)
+            result = None
+        return result
+
 
 if __name__ == "__main__":
 
     #u = steamUser('76561197983132487')
-    u = SteamUser('gabbeh')
+    u = SteamUser('76561197983132487')
     # log.debug (u)
-    friends = u.getFriendList()
-    games = u.getOwnedGames()
+    # friends = u.getFriendList()
+    # games = u.getOwnedGames()
 
-    log.debug('u.personaname: {}'.format(u.personaname))
-    log.debug('u.id: {}'.format(u.steamid))
-    log.debug('u.steamid: {}'.format(u.steamid))
-    #log.debug ( friends )
-    log.debug(games)
-    for k, v in u.getFriendList():
-        log.debug('\n{}\n{}\n'.format(k, v))
+    # log.debug('u.personaname: {}'.format(u.personaname))
+    # log.debug('u.id: {}'.format(u.steamid))
+    # log.debug('u.steamid: {}'.format(u.steamid))
+    # #log.debug ( friends )
+    # log.debug(games)
+    # for k, v in u.getFriendList():
+    #     log.debug('\n{}\n{}\n'.format(k, v))
+
+    # UserGroups
+    groups = u.getUserGroupList()
+    pprint(groups)

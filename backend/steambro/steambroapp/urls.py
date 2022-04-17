@@ -5,7 +5,7 @@ from .views.tinder import TinderView
 from .api.views import SteamGameViewSet, SteamUserViewSet, UserGameGroupViewSet
 from rest_framework import routers
 from .views import IndexView, SteamUserListView, SteamUserDetailView, SteamUserGamesListView
-from .views import SteamGameListView, SteamGameDetailView, SteamUserGameIconsView, SteamUserFriendsNetworkView, NetworkView, NetworkSigmaView
+from .views import SteamGameListView, SteamGameDetailView, SteamUserGameIconsView, SteamUserFriendsNetworkView, NetworkView, NetworkSigmaView, SteamGroupNetworkView
 from .views import UserGameListView, UserFriendListView, couch_home
 from django.urls import path, include
 
@@ -30,6 +30,10 @@ urlpatterns = [
     path('steamuser/<int:pk>/game-icons', SteamUserGameIconsView.as_view(), name='steamuser-gameicons'),
     path('steamuser/<int:pk>/friends-network', SteamUserFriendsNetworkView.as_view(), name='steamuser-friends-network'),
     
+    # Steam Group
+    path('steamgroup/<int:groupID64>/network', SteamGroupNetworkView.as_view(), name='steamuser-friends-network'),
+    
+    # Network
     path('network/', NetworkView.as_view(), name='network'),
     path('network-sigma/', NetworkSigmaView.as_view(), name='network'),
 
