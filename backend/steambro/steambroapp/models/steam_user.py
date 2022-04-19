@@ -11,6 +11,8 @@ from django.utils import timezone
 import datetime as dt
 from django.db import transaction
 from progress.bar import Bar
+import time
+
 
 logger = logging.getLogger(__name__)
 
@@ -131,6 +133,7 @@ class SteamUser(models.Model):
 
     friendships_are_public = models.BooleanField(default=True)
     friendships_updated = models.DateTimeField(blank=True, null=True)
+    summary_updated = models.DateTimeField(blank=True, null=True)
 
 
     owned_games_list = models.CharField(
@@ -191,6 +194,7 @@ class SteamUser(models.Model):
                     input('...')
 
         try:
+            self.summary_updated = timezone.now()
             self.save()
         except django.db.utils.DataError as e:
             logger.error(e)
@@ -225,25 +229,70 @@ class SteamUser(models.Model):
 
         steamid_list = []
 
-        with Bar('Adding Friendships...') as bar:
-            for friend in rj['friendslist']['friends']:
-                friend_steamid = int(friend['steamid'])
-                steamid_list.append(friend_steamid)
-                friendObject, created = SteamUser.objects.get_or_create(steamid=friend_steamid)
-                
-                # Kan ikke refreshe alle venner bare fordi man trenger freidnship updates.
-                # if created is True:
-                #     friendObject.refresh_summary()
-                #     friendObject.save()
+        friend_length = len(rj['friendslist']['friends'])
+        i = 0
+        timings = {
+            'created': [],
+            'not_created': [],
+        }
+        for friend in rj['friendslist']['friends']:
+            start_time = time.time()
+            i += 1
+            if i % 10 == 0:
+                logger.debug(f'{i}/{friend_length}')
 
-                # logger.debug('Adding Friendship')
-                self.add_friendship(friendObject, timezone.make_aware(dt.datetime.fromtimestamp(friend['friend_since'])), friend['relationship'])
-                # logger.debug('Added Friendship')
+            friend_steamid = int(friend['steamid'])
+            steamid_list.append(friend_steamid)
+            
+            # logger.debug('get or create friend')
+            friendObject, created = SteamUser.objects.get_or_create(steamid=friend_steamid)
+            # logger.debug(f'{friendObject} created? {created}')
+            
+            # Kan ikke refreshe alle venner bare fordi man trenger freidnship updates.
+            # if created is True:
+            #     friendObject.refresh_summary()
+            #     friendObject.save()
 
-                bar.next()
+            # logger.debug('Adding Friendship')
+            # logger.debug('adding friendship')
+            self.add_friendship(friendObject, timezone.make_aware(dt.datetime.fromtimestamp(friend['friend_since'])), friend['relationship'])
+            # logger.debug('friendship added')
+            # logger.debug('Added Friendship')
+            end_time = time.time()
+            total_time = end_time-start_time
+            if created is True:
+                timings['created'].append(total_time)
+            elif created is False:
+                timings['not_created'].append(total_time)
 
         self.friendships_updated = timezone.now()
         self.save()
+
+        # average timings
+        sum_created_timings = 0
+        for created_timing in timings['created']:
+            sum_created_timings += created_timing
+
+        sum_not_created_timings = 0
+        for not_created_timing in timings['not_created']:
+            sum_not_created_timings += not_created_timing
+
+        average_created_timings = 0
+        if len(timings['created']) > 0:
+            average_created_timings = sum_created_timings / len(timings['created'])
+        
+        average_not_created_timings = 0
+        if len(timings['not_created']) > 0:
+            average_not_created_timings = sum_not_created_timings / len(timings['not_created'])
+
+        logger.debug(f'{len(timings["created"])=}')
+        logger.debug(f'{len(timings["not_created"])=}')
+        logger.debug(f'{average_created_timings=}')
+        logger.debug(f'{average_not_created_timings=}')
+
+        total_time = sum_created_timings + sum_not_created_timings
+        logger.debug(f'{total_time=}')
+
 
         return self.get_friendships()
 

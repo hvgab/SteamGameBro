@@ -59,11 +59,12 @@ class SteamGroupNetworkView(TemplateView):
                 user_list.append(
                     {
                         'id': steam_user.id,
+                        'personaname': steam_user.personaname,
                         'primaryclanid': str(steam_user.primaryclanid),
                         'label': f'{steam_user.id} - {steam_user.personaname}',
                         'x': random.random(),
                         'y': random.random(),
-                        'color': 'blue',
+                        'color': '#555',
                         'size': 5,
                         # 'type': "image", 
                         # 'image': steam_user.avatar,

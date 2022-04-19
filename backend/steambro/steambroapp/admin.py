@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import SteamUser, SteamGame, Friendship, GameGroup, UserGameGroup
+# from .models import SteamGroup
 # Register your models here.
 from . import services
 
@@ -38,3 +39,7 @@ class GameGroupAdmin(admin.ModelAdmin):
 @admin.register(UserGameGroup)
 class UserGameGroupAdmin(admin.ModelAdmin):
     pass
+
+# @admin.register(SteamGroup)
+# class SteamGroupAdmin(admin.ModelAdmin):
+#     pass
