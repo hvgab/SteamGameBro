@@ -5,7 +5,7 @@ chardet==3.0.4
 cryptography==3.1.1
 defusedxml==0.6.0
 Django==4
-django-debug-toolbar==3.1.1
+django-debug-toolbar==3.2.1
 django-developer-panel==0.1.2
 idna==2.10
 oauthlib==3.1.0
