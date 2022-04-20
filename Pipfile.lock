@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "af6de9b0ffc0e10ead1500e53ee89c23bab62548c5229aef75ac2c1dcbde23c2"
+            "sha256": "2ab9c14125ca2b4c4ca78e632b83942d0150b2926128723241bdf265b49eeeb6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -41,11 +41,11 @@
         },
         "django": {
             "hashes": [
-                "sha256:59304646ebc6a77b9b6a59adc67d51ecb03c5e3d63ed1f14c909cdfda84e8010",
-                "sha256:d5a8a14da819a8b9237ee4d8c78dfe056ff6e8a7511987be627192225113ee75"
+                "sha256:110fb58fb12eca59e072ad59fc42d771cd642dd7a2f2416582aa9da7a8ef954a",
+                "sha256:996495c58bff749232426c88726d8cd38d24c94d7c1d80835aafffa9bc52985a"
             ],
             "index": "pypi",
-            "version": "==4.0"
+            "version": "==4.0.2"
         },
         "gunicorn": {
             "hashes": [
@@ -86,14 +86,6 @@
             ],
             "markers": "python_version >= '3.5'",
             "version": "==0.4.2"
-        },
-        "tzdata": {
-            "hashes": [
-                "sha256:238e70234214138ed7b4e8a0fab0e5e13872edab3be586ab8198c407620e2ab9",
-                "sha256:8b536a8ec63dc0751342b3984193a3118f8fca2afe25752bb9b7fffd398552d3"
-            ],
-            "markers": "sys_platform == 'win32'",
-            "version": "==2022.1"
         },
         "urllib3": {
             "hashes": [
