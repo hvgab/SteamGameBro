@@ -70,7 +70,7 @@ class GameGroupAdmin(admin.ModelAdmin):
 
 @admin.register(UserGameGroup)
 class UserGameGroupAdmin(admin.ModelAdmin):
-    pass
+    ordering = ['user_id', 'game_id']
 
 # @admin.register(SteamGroup)
 # class SteamGroupAdmin(admin.ModelAdmin):

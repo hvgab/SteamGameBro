@@ -111,6 +111,8 @@ WSGI_APPLICATION = 'steambroproject.wsgi.application'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
+DEFAULT_EXCEPTION_REPORTER = "exceptionite.django.ExceptioniteReporter"
+
 DATABASES = {
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',

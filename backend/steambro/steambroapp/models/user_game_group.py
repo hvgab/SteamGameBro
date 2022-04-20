@@ -8,6 +8,14 @@ class UserGameGroup(models.Model):
     game = models.ForeignKey(to='SteamGame', on_delete=models.CASCADE)
     group = models.ForeignKey(to='GameGroup', on_delete=models.CASCADE)
     
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                 fields=['user', 'game', 'group'], 
+                 name='unique_user_game_group'
+            )
+    ]
+
     def __repr__(self):
         return f'<UserGameGroup({self.id}, user={self.user!r}, game={self.game!r}, group={self.group!r})>'
 

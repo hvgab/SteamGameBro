@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load dev_tags %}
+{% load steambro_tags %}
 {% block content %}
-
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@mdi/font@6.5.95/css/materialdesignicons.min.css">
     <div class="hero is-primary">
         <div class="hero-body">
             <h1 class="title has-text-centered">{{ user.steamuser.name }} Wall</h1>
@@ -9,35 +10,28 @@
     </div>
     
     <section class="section has-text-centered">
-        {% comment %} <div class="container"> {% endcomment %}
-            {% for game in steamgame_list %}
-            <a href="{% url 'steambro:steamgame-detail' pk=game.id %}">
-                <img src="{{ game.capsule }}" alt="{{game.name}} icon" class="img" style="width:calc(300px*0.3); height:calc(450px*0.3);" onerror="this.style.display='none';">
-            </a>
-            {% endfor %}
-        {% comment %} </div> {% endcomment %}
-    </section>
-
-    <section class="section has-text-centered">
-        {% comment %} <div class="container"> {% endcomment %}
-            {% for game in steamgame_list %}
-            <a href="{% url 'steambro:steamgame-detail' pk=game.id %}">
-                <img src="{{ game.capsule_231x87 }}" alt="{{game.name}} icon" class="img" style="width:calc(231px*0.5); height:calc(87px*0.5);" onerror="this.style.display='none';">
-            </a>
-            {% endfor %}
-        {% comment %} </div> {% endcomment %}
-    </section>
-
-    <section class="section">
-        {% comment %} <div class="container"> {% endcomment %}
-            {% for game in steamgame_list %}
-            {% comment %} <figure class="image is-48x48 is-inline-flex"> {% endcomment %}
-                <a href="{% url 'steambro:steamgame-detail' pk=game.id %}">
-                    <img src="{{ game.get_icon_url }}" alt="{{game.name}} icon" class="img" onerror="this.style.display='none';">
+        <h1 class="title">Header with Placeholders and thumbs</h1>
+            {% for gg in game_group_list %}
+            <div class="game-container" style="position: relative; display: inline-block;">
+                <div class="category-icon" style="position: absolute; z-index: 2;">
+                    {{ gg.group.name }}
+                </div>
+                <div class="category-icon" style="position: absolute; z-index: 2; right: 2px; bottom: 6px;">
+                    {% if gg.group.name == 'YES' %}
+                    <span class="icon is-large has-text-success" style="text-shadow: 5px 5px 5px black;">
+                        <i class="mdi mdi-48px mdi-thumb-up"></i>
+                    </span>
+                    {% elif gg.group.name == 'NO' %}
+                    <span class="icon is-large has-text-danger" style="text-shadow: 5px 5px 5px black;">
+                        <i class="mdi mdi-48px mdi-thumb-down"></i>
+                    </span>
+                    {% endif %}
+                </div>
+                <a href="{% url 'steambro:steamgame-detail' pk=gg.game.id %}">
+                    <img src="{{ gg.game.header }}" alt="{{gg.game.name}} header" class="img" style="width:calc(460px*0.5); height:calc(215px*0.5);" onerror="this.src='https://placeholder.pics/svg/460x215/DEDEDE/555555/{{gg.game.name}}';">
                 </a>
-            {% comment %} </figure> {% endcomment %}
+            </div>
             {% endfor %}
-        {% comment %} </div> {% endcomment %}
     </section>
 
 {% endblock content %}
