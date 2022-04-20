@@ -2,6 +2,42 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<section class="hero is-dark">
+    <!-- Hero content: will be in the middle -->
+    <div class="hero-body">
+      <div class="container has-text-centered">
+          <div class="columns is-vcentered">
+              <div class="column is-2">
+                <img src="{{object.avatarfull}}" alt="" class="img">
+              </div>
+              <div class="column is-8">
+                  <p class="title">
+                    {{ steamuser.personaname }}
+                  </p>
+                  <br>
+                  <p class="subtitle">
+                    <a href="{{ steamuser.profileurl }}">{{ steamuser.profileurl }}</a>
+                  </p>
+              </div>
+          </div>
+      </div>
+    </div>
+  
+    <!-- Hero footer: will stick at the bottom -->
+    <div class="hero-foot">
+      <nav class="tabs">
+        <div class="container">
+          <ul>
+            <li class="is-active"><a>Overview</a></li>
+            <li><a href="{% url 'steambro:steamuser-friends-network' pk=steamuser.pk %}">Friends Network</a></li>
+            <li><a href="{% url 'steambro:steamuser-friends-network' pk=steamuser.pk %}?include_self=1">Friends Network include self</a></li>
+            
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </section>
+
 <section class="section">
     <div class="container">
 
@@ -64,29 +100,30 @@
     </section>
     
 <section class="section">
+    <h1 class="title">Friend Grid</h1>
+
+</section>
+
+{% comment %} Friends table {% endcomment %}
+<section class="section">
     <div class="container">
     <h1 class="title">Friends</h1>
     <table class="table">
         <tr>
-            <td>friend.steamid</td>
-            <td>friend.personaname</td>
-            <td>friend.profileurl</td>
-            <td>avatarhash</td>
-            <td>Actions</td>
-            <td>Actions</td>
-            <td>Actions</td>
+            <td>ID</td>
+            <td>Avatar</td>
+            <td>SteamID</td>
+            <td>PersonaName</td>
+            <td>Steam Profile URL</td>
             <td>Actions</td>
         </tr>
         {% for friend in object.friendships.all %}
         <tr>
+            <td>{{friend.id}}</td>
+            <td><img src="{{friend.avatar}}" alt=""></td>
             <td>{{friend.steamid}}</td>
             <td>{{friend.personaname}}</td>
             <td>{{friend.profileurl}}</td>
-            <td>{{friend.personaname}}</td>
-            <td>{{friend.personaname}}</td>
-            <td>{{friend.personaname}}</td>
-            <td>{{friend.personaname}}</td>
-            <td>{{friend.personaname}}</td>
             <td>
                 <a href="{% url 'steambro:steamuser-detail' friend.pk %}">
                     View

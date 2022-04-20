@@ -10,9 +10,10 @@ import json
 from django.utils import timezone
 import datetime as dt
 from django.db import transaction
+from .steam_user_friendship import Friendship
 from progress.bar import Bar
 import time
-
+from itertools import islice
 
 logger = logging.getLogger(__name__)
 
@@ -218,12 +219,14 @@ class SteamUser(models.Model):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            logger.error(f'Request error on get_steam_friends for {self.steamid}')
+            logger.error(f'Request error on get_steam_friends for {self}')
             logger.error(e)
+            logger.debug(f'{self.friendships_are_public=}')
             self.friendships_are_public = False
             self.save()
+            logger.debug(f'{self.friendships_are_public=}')
             return
-
+        
         # should we remove all friends here to remove old friendships?
         rj = r.json()
 
@@ -235,6 +238,9 @@ class SteamUser(models.Model):
             'created': [],
             'not_created': [],
         }
+
+        friends_bulk = []
+
         for friend in rj['friendslist']['friends']:
             start_time = time.time()
             i += 1
@@ -246,6 +252,10 @@ class SteamUser(models.Model):
             
             # logger.debug('get or create friend')
             friendObject, created = SteamUser.objects.get_or_create(steamid=friend_steamid)
+            friends_since = timezone.make_aware(dt.datetime.fromtimestamp(friend['friend_since']))
+            
+            friends_bulk.append(Friendship(from_steamuser=friendObject, to_steamuser=self, friends_since=friends_since, relationship=friend['relationship']))
+            friends_bulk.append(Friendship(from_steamuser=self, to_steamuser=friendObject, friends_since=friends_since, relationship=friend['relationship']))
             # logger.debug(f'{friendObject} created? {created}')
             
             # Kan ikke refreshe alle venner bare fordi man trenger freidnship updates.
@@ -255,7 +265,7 @@ class SteamUser(models.Model):
 
             # logger.debug('Adding Friendship')
             # logger.debug('adding friendship')
-            self.add_friendship(friendObject, timezone.make_aware(dt.datetime.fromtimestamp(friend['friend_since'])), friend['relationship'])
+            # self.add_friendship(friendObject, timezone.make_aware(dt.datetime.fromtimestamp(friend['friend_since'])), friend['relationship'])
             # logger.debug('friendship added')
             # logger.debug('Added Friendship')
             end_time = time.time()
@@ -265,6 +275,13 @@ class SteamUser(models.Model):
             elif created is False:
                 timings['not_created'].append(total_time)
 
+        # Batch insert
+        logger.debug(f'Start bulk insert for {len(friends_bulk)} friends')
+        batch_size=1000
+        Friendship.objects.bulk_create(friends_bulk, batch_size, ignore_conflicts=True)
+        logger.debug('end bulk create')
+        
+        self.friendships_are_public = True
         self.friendships_updated = timezone.now()
         self.save()
 
@@ -285,13 +302,13 @@ class SteamUser(models.Model):
         if len(timings['not_created']) > 0:
             average_not_created_timings = sum_not_created_timings / len(timings['not_created'])
 
-        logger.debug(f'{len(timings["created"])=}')
-        logger.debug(f'{len(timings["not_created"])=}')
-        logger.debug(f'{average_created_timings=}')
-        logger.debug(f'{average_not_created_timings=}')
+        # logger.debug(f'{len(timings["created"])=}')
+        # logger.debug(f'{len(timings["not_created"])=}')
+        # logger.debug(f'{average_created_timings=}')
+        # logger.debug(f'{average_not_created_timings=}')
 
         total_time = sum_created_timings + sum_not_created_timings
-        logger.debug(f'{total_time=}')
+        # logger.debug(f'{total_time=}')
 
 
         return self.get_friendships()

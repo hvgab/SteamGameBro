@@ -132,6 +132,7 @@
     <script src="{% static 'steambroapp/getCookie.js' %}"></script>
     {{ friends | json_script:"steam_users" }}
     {{ friendships | json_script:"steam_users_friendships" }}
+    {{ watermark_json | json_script:"watermark" }}
     <script src="{% static 'steambroapp/graphSteamUserFriendships.js' %}"></script>
     <script src="{% static 'steambroapp/graphSaveToPng.js' %}"></script>
     <script src="{% static 'steambroapp/graphSearch.js' %}"></script>

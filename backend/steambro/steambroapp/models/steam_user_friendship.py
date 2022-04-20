@@ -1,7 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+
 class Friendship(models.Model):
+    
     """ Friendship between SteamUsers
         
         Don't create friendships here directly, use steam_user.add_friendship()
@@ -10,6 +12,15 @@ class Friendship(models.Model):
     to_steamuser = models.ForeignKey("steambroapp.SteamUser", verbose_name="", on_delete=models.CASCADE, related_name='to_steamusers')
     friends_since = models.DateTimeField(_("friends since"))
     relationship = models.CharField(_("relationship"), max_length=50)
+
+    # TODO: Add from_steamuser+to_steamuser as unique constraint
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                 fields=['from_steamuser', 'to_steamuser'], 
+                 name='unique_friendship'
+            )
+    ]
 
     def __str__(self) -> str:
         return f'{self.from_steamuser} -> {self.to_steamuser}'

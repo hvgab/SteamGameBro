@@ -87,6 +87,14 @@ class SteamGroupNetworkView(TemplateView):
         context["friends"] = user_list
         context["friendships"] = friendship_list
 
+        group = groupAPI.get_group_info()
+        context["watermark_json"] = {
+            'name':group['groupName'], 
+            # 'steamid':group['steamid'], 
+            'steamurl': group['groupURL'], 
+            'avatar': group['avatarMedium'], 
+        }
+
         return context
     
 

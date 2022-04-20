@@ -12,6 +12,10 @@ class SteamUserListView(ListView):
 
 class SteamUserDetailView(DetailView):
     model = SteamUser
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['steamuser'].refresh_summary()
+        return context
 
 class SteamUserGamesListView(ListView):
     """All games of user"""

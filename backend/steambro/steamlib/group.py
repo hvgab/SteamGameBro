@@ -43,7 +43,8 @@ class SteamGroup(object):
         tree = ElementTree.fromstring(r.content)
         rd = xmltodict.parse(r.content)
 
-        members = rd['memberList']
+        info = rd['memberList']['groupDetails']
+        logger.debug(pformat(info))
 
         pprint(f"{rd['memberList']['groupDetails']['groupName']=}")
         pprint(f"{rd['memberList']['groupDetails']['groupURL']=}")
@@ -54,7 +55,7 @@ class SteamGroup(object):
         pprint(f"{rd['memberList']['groupDetails']['avatarFull']=}")
         pprint(f"{rd['memberList']['groupDetails']['memberCount']=}")
 
-        return rd
+        return info
 
 
 if __name__ == "__main__":

@@ -2,321 +2,115 @@
 {% load dev_tags %}
 {% load static %}
 {% block content %}
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Square+Peg&display=swap" rel="stylesheet"> 
     <div class="hero is-primary">
         <div class="hero-body">
             <h1 class="title has-text-centered">{{ steam_user.id }} {{ steam_user.personaname }} Friends</h1>
             <h1 class="subtitle has-text-centered">{{ steam_user.steamid }}</h1>
             <p class="subtitle has-text-centered">
-                {% if steam_user.communityvisibilitystate == 3 %}
-                Public
+                Friends are
+                {% if steam_user.friendships_are_public is True %}
+                    Public
                 {% else %}
-                Private
+                    Private
                 {% endif %}
             </p>
         </div>
     </div>
 
-    <div class="section">
+    <div class="section container">
         <h1 class="title">Network Visualization</h1>
-        <div class="box">
-            <div id="search">
-                <input type="search" id="search-input" list="suggestions" placeholder="Try searching for a node..." />
-                <datalist id="suggestions"></datalist>
-              </div>
-            <div id="demo-canvas" style="height: 720px;"></div>
+
+            <div class="box">
+                <div id="graph-canvas" style="height: 720px;"></div>
+                {% comment %}
+                Search
+                
+                {% endcomment %}
+                <div id="search">
+                    <input type="search"
+                           id="search-input"
+                           list="suggestions"
+                           placeholder="Try searching for a node..."/>
+                    <datalist id="suggestions"></datalist>
+                </div>
+                {% comment %}
+            Buttons
+
+                {% endcomment %}
+                <div id="buttons">
+                    {% comment %} Random {% endcomment %}
+                    <button id="random" class="button">
+                        <span class="icon">
+                            <img src="{% static 'steambroapp/noun-dice-4315661.svg' %}" />
+                        </span>
+                        <span>random</span>
+                    </button>
+                    {% comment %} Force Atlas 2 {% endcomment %}
+                    <button id="forceatlas2" class="button">
+                        <span class="icon">
+                            <img id="forceatlas2-start-label"
+                                 class="img"
+                                 src="{% static 'steambroapp/noun-atlas-3863916.svg' %}"/>
+                            <img id="forceatlas2-stop-label"
+                                 class="img"
+                                 style="display: none"
+                                 src="{% static 'steambroapp/noun-atlas-3863916.svg' %}"/>
+                        </span>
+                        <span>Force Atlas 2</span>
+                    </button>
+                    {% comment %} Circular {% endcomment %}
+                    <button id="circular" class="button">
+                        <span class="icon">
+                            <img src="{% static 'steambroapp/noun-circle-200124.svg' %}" />
+                        </span>
+                        <span>circular</span>
+                    </button>
+                    {% comment %} Circlepack Community {% endcomment %}
+                    <button id="circlepack" class="button">
+                        <span class="icon">
+                            <img src="{% static 'steambroapp/noun-circles-3459120.svg' %}" />
+                        </span>
+                        <span>circlepack Community</span>
+                    </button>
+                    {% comment %} Circlepack Primary Clan {% endcomment %}
+                    <button id="circlepackPrimaryClan" class="button">
+                        <span class="icon">
+                            <img src="{% static 'steambroapp/noun-circles-3459120.svg' %}" />
+                        </span>
+                        <span>circlepack PrimaryClan</span>
+                    </button>
+                    {% comment %} Save as PNG {% endcomment %}
+                    <button type="button" id="save-as-png">Save as PNG</button>
+                    {% comment %} Labels Threshold {% endcomment %}
+                    <div class="input">
+                        <label for="labels-threshold">Labels threshold</label>
+                        <input id="labels-threshold" type="range" min="0" max="15" step="0.5" />
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
     <div class="section">
         <pre><code>{{ friends }}</code></pre>
     </div>
     <div class="section">
         <pre><code>{{ friendships }}</code></pre>
     </div>
-    
     <script src="https://code.jquery.com/jquery.js"></script>
-    <script src="https://d3js.org/d3.v3.js"></script>
     <script src="{% static 'steambroapp/graphology.min.js' %}"></script>
     <script src="{% static 'steambroapp/graphology-library.min.js' %}"></script>
+    <script src="{% static 'steambroapp/FileSaver.js' %}"></script>
     <script src="{% static 'steambroapp/sigma.min.js' %}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.4.4/d3.min.js" integrity="sha512-hnFpvCiJ8Fr1lYLqcw6wLgFUOEZ89kWCkO+cEekwcWPIPKyknKV1eZmSSG3UxXfsSuf+z/SgmiYB1zFOg3l2UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js" integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <script>
-        // JavaScript function to get cookie by name; retrieved from https://docs.djangoproject.com/en/3.1/ref/csrf/
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-    </script>
-    <script src="{% static 'steambroapp/jsnetworkx.js' %}"></script>
-    {{ friends | json_script:"friends" }}
-    {{ friendships | json_script:"friendships" }}
-    
-
-    {% comment %} SIGMA GRAPHOLOGY {% endcomment %}
-    <script>
-        const container = document.getElementById("demo-canvas")
-        const searchInput = document.getElementById("search-input");
-        const searchSuggestions = document.getElementById("suggestions");
-
-        // instantiate sigma
-        const graph = new graphology.Graph();
-        
-
-
-        
-
-        var FA2Layout = graphologyLibrary.FA2Layout;
-        var forceAtlas2 = graphologyLibrary.layoutForceAtlas2;
-
-        var friends = JSON.parse(document.getElementById('friends').textContent);
-        console.log('friends')
-        console.log(friends)
-        var users = friends;
-        
-        var friendships = JSON.parse(document.getElementById('friendships').textContent);
-        console.log('friendships')
-        console.log(friendships)
-
-        console.log('Adding Nodes')
-        for (user of users) {
-            //console.log('user');
-            //console.log(user);
-            //console.log(user.id);
-            try {
-                graph.addNode(user.id, user);
-            } catch (error) {
-                if (error.name == 'UsageGraphError') {
-                } else {
-                    console.error(error);
-                }
-            }
-        }
-        console.log('Finished adding nodes');
-        
-        console.log('Adding Edges')
-        for (fs of friendships){
-            //console.log('fs');
-            //console.log(fs);
-            try {
-                graph.addEdge(fs.source, fs.target);
-            } catch (error) {
-                if (error.name == 'UsageGraphError') {
-                } else {
-                    console.error(error);
-                }
-            }
-        }
-        console.log('Finished adding edges');
-
-        // To directly assign communities as a node attribute
-        //communities = graphologyLibrary.communitiesLouvain(graph);
-        //console.log('Communities: ');
-        //console.log(communities);
-        communityDetails = graphologyLibrary.communitiesLouvain.detailed(graph);
-        console.log(communityDetails);
-
-        graphologyLibrary.communitiesLouvain.assign(graph);
-
-        var communities = communityDetails.communities;
-        console.log(communities);
-
-        console.log('comm values');
-        console.log(Object.values(communities));
-
-        var commValues = Object.values(communities);
-
-        function getUniqueVal(value, index, self) { 
-            return self.indexOf(value) === index;
-        }
-        
-        var uniqueCommunities = commValues.filter( getUniqueVal ); 
-        console.log('uniqueCommunities'); 
-        console.log(uniqueCommunities); 
-        
-        // colors = chroma.scale('YlGnBu').classes(uniqueCommunities.length);
-        colors = chroma.scale(['#fbb4ae', '#b3cde3', '#ccebc5']).domain([0, uniqueCommunities.length]);
-        console.log('colors');
-        console.log(colors);
-
-        var paletteDict = {}
-        for (let i = 0; i < uniqueCommunities.length; i++) {
-            console.log('colors(i) : ' + colors(i));
-            console.log('colors(i).hex() : ' + colors(i).hex());
-            paletteDict[uniqueCommunities[i]] = colors(i).hex();
-        } 
-
-        console.log('paletteDict');
-        console.log(paletteDict);
-
-        // change node appearance
-        graph.forEachNode((node, atts) => {
-            console.log('node: '+node);
-            console.log('atts: '+atts);
-            console.log(atts.community);
-            atts.color = paletteDict[atts.community];
-            // node size depends on its degree
-            atts.size = Math.sqrt(graph.degree(node));
-            // store cluster's nodes positions to calculate cluster label position
-            // cluster.positions.push({ x: atts.x, y: atts.y });
-        });
-
-        // create and assign one color by community
-
-        // var positions = graphologyLibrary.layout.circular(graph);
-        graphologyLibrary.layout.circular.assign(graph);        
-
-        const sensibleSettings = forceAtlas2.inferSettings(graph);
-        const fa2Layout = new FA2Layout(graph, {
-            settings: sensibleSettings,
-        });
-
-        var renderer = new Sigma(graph, container);
-
-        fa2Layout.start()
-
-
-
-        {% comment %} SIGMA ACTIONS {% endcomment %}
-        const state = { searchQuery: ""}
-
-        // Feed the datalist autocomplete values:
-        searchSuggestions.innerHTML = graph.nodes().map(
-                node => `<option value="${graph.getNodeAttribute(node, "label")}"></option>`
-            )
-            .join("\n")
-
-        // Actions:
-        function setSearchQuery(query) {
-            state.searchQuery = query
-        
-            if (searchInput.value !== query) searchInput.value = query
-        
-            if (query) {
-            const lcQuery = query.toLowerCase()
-            const suggestions = graph
-                .nodes()
-                .map(n => ({ id: n, label: graph.getNodeAttribute(n, "label") }))
-                .filter(({ label }) => label.toLowerCase().includes(lcQuery))
-        
-            // If we have a single perfect match, them we remove the suggestions, and
-            // we consider the user has selected a node through the datalist
-            // autocomplete:
-            if (suggestions.length === 1 && suggestions[0].label === query) {
-                state.selectedNode = suggestions[0].id
-                state.suggestions = undefined
-        
-                // Move the camera to center it on the selected node:
-                const nodePosition = renderer.getNodeDisplayData(state.selectedNode)
-                renderer.getCamera().animate(nodePosition, {
-                duration: 500
-                })
-            }
-            // Else, we display the suggestions list:
-            else {
-                state.selectedNode = undefined
-                state.suggestions = new Set(suggestions.map(({ id }) => id))
-            }
-            }
-            // If the query is empty, then we reset the selectedNode / suggestions state:
-            else {
-            state.selectedNode = undefined
-            state.suggestions = undefined
-            }
-        
-            // Refresh rendering:
-            renderer.refresh()
-        }
-        function setHoveredNode(node) {
-            if (node) {
-            state.hoveredNode = node
-            state.hoveredNeighbors = new Set(graph.neighbors(node))
-            } else {
-            state.hoveredNode = undefined
-            state.hoveredNeighbors = undefined
-            }
-        
-            // Refresh rendering:
-            renderer.refresh()
-        }
-        
-        // Bind search input interactions:
-        searchInput.addEventListener("input", () => {
-            setSearchQuery(searchInput.value || "")
-        })
-        searchInput.addEventListener("blur", () => {
-            setSearchQuery("")
-        })
-        
-        // Bind graph interactions:
-        renderer.on("enterNode", ({ node }) => {
-            setHoveredNode(node)
-        })
-        renderer.on("leaveNode", () => {
-            setHoveredNode(undefined)
-        })
-
-        // Render nodes accordingly to the internal state:
-        // 1. If a node is selected, it is highlighted
-        // 2. If there is query, all non-matching nodes are greyed
-        // 3. If there is a hovered node, all non-neighbor nodes are greyed
-        renderer.setSetting("nodeReducer", (node, data) => {
-            const res = { ...data }
-        
-            if (
-            state.hoveredNeighbors &&
-            !state.hoveredNeighbors.has(node) &&
-            state.hoveredNode !== node
-            ) {
-            res.label = ""
-            res.color = "#f6f6f6"
-            }
-        
-            if (state.selectedNode === node) {
-            res.highlighted = true
-            } else if (state.suggestions && !state.suggestions.has(node)) {
-            res.label = ""
-            res.color = "#f6f6f6"
-            }
-        
-            return res
-        })
-        
-        // Render edges accordingly to the internal state:
-        // 1. If a node is hovered, the edge is hidden if it is not connected to the
-        //    node
-        // 2. If there is a query, the edge is only visible if it connects two
-        //    suggestions
-        renderer.setSetting("edgeReducer", (edge, data) => {
-            const res = { ...data }
-        
-            if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
-            res.hidden = true
-            }
-        
-            if (
-            state.suggestions &&
-            (!state.suggestions.has(graph.source(edge)) ||
-                !state.suggestions.has(graph.target(edge)))
-            ) {
-            res.hidden = true
-            }
-        
-            return res
-        })
-    </script>
-
+    <script src="{% static 'steambroapp/getCookie.js' %}"></script>
+    {{ friends | json_script:"steam_users" }}
+    {{ friendships | json_script:"steam_users_friendships" }}
+    {{ watermark_json | json_script:"watermark" }}
+    <script src="{% static 'steambroapp/graphSteamUserFriendships.js' %}"></script>
+    <script src="{% static 'steambroapp/graphSaveToPng.js' %}"></script>
+    <script src="{% static 'steambroapp/graphSearch.js' %}"></script>
 {% endblock content %}

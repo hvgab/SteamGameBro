@@ -42,7 +42,14 @@ var friendships = JSON.parse(friendships_json.textContent);
  **/
 console.log('Start adding nodes')
 for (user of steam_users) {
-    graph.addNode(user.id, user);
+    try {
+        graph.addNode(user.id, user);
+    } catch (error) {
+        if (error.name == 'UsageGraphError') {
+        } else {
+            console.error(error);
+        }
+    }
 }
 console.log('End adding nodes');
 /** 
@@ -159,7 +166,7 @@ graph.forEachNode((node, atts) => {
 // colors = ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#ffff99", "#b15928"]
 
 // paired 12 - better sorted
-colors = ["#1f78b4","#33a02c","#e31a1c","#ff7f00","#6a3d9a","#b15928","#a6cee3","#b2df8a","#fb9a99","#fdbf6f","#cab2d6","#ffff99",]
+colors = ["#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a", "#b15928", "#a6cee3", "#b2df8a", "#fb9a99", "#fdbf6f", "#cab2d6", "#ffff99",]
 
 // set 3
 //colors = ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9","#bc80bd","#ccebc5","#ffed6f"]
@@ -181,7 +188,7 @@ console.log('communityPaletteDict');
 console.log(communityPaletteDict);
 // Add to HTML page
 var communityPaletteHTML = document.getElementById('communityColorPalette')
-if (communityPaletteHTML == null){
+if (communityPaletteHTML == null) {
     console.error('Add #communityColorPalette to show palette on page')
 } else {
     for (color of colors) {
@@ -217,7 +224,7 @@ var renderer = new Sigma(graph, container);
  * 
  */
 var nodeTable = document.getElementById('nodeTable');
-if (nodeTable == null){
+if (nodeTable == null) {
     console.error('Add #nodeTable to see a node table on page')
 } else {
     graph.forEachNode((node, atts) => {
@@ -242,12 +249,16 @@ if (nodeTable == null){
  *  
  **/
 const labelsThresholdRange = document.getElementById("labels-threshold");
-// Bind labels threshold to range input
-labelsThresholdRange.addEventListener("input", () => {
-    renderer.setSetting("labelRenderedSizeThreshold", +labelsThresholdRange.value);
-});
-// Set proper range initial value:
-labelsThresholdRange.value = renderer.getSetting("labelRenderedSizeThreshold") + "";
+if (labelsThresholdRange == null) {
+    console.error('To show threshold slider add: <input id="labels-threshold" type="range" min="0" max="15" step="0.5" /> ')
+} else {
+    // Bind labels threshold to range input
+    labelsThresholdRange.addEventListener("input", () => {
+        renderer.setSetting("labelRenderedSizeThreshold", +labelsThresholdRange.value);
+    });
+    // Set proper range initial value:
+    labelsThresholdRange.value = renderer.getSetting("labelRenderedSizeThreshold") + "";
+}
 
 
 /**
@@ -287,6 +298,16 @@ function setEdgeColor() {
             if (sourceAttributes.color == targetAttributes.color) {
                 console.log(`Colors are the same, setting edge color.`)
                 graph.setEdgeAttribute(edge, 'color', sourceAttributes.color);
+            } else {
+                // Source and target has different colors.
+                // Make a mix between and use that.
+                console.log(`mixing: ${sourceAttributes.color} ${targetAttributes.color}`)
+                console.log(`mixing: ${sourceAttributes.color} ${targetAttributes.color}`)
+                if (!(sourceAttributes.color == undefined || targetAttributes.color == undefined)){
+                    mixColor = chroma.mix(sourceAttributes.color, targetAttributes.color, 0.5, 'lrgb').hex();
+                    console.log(`mixColor: ${mixColor}`)
+                    graph.setEdgeAttribute(edge, 'color', mixColor);
+                }
             }
         });
 }
@@ -317,7 +338,6 @@ function stopFA2() {
 function startFA2() {
     if (graphNodeColor != 'COMMUNITY') colorNodesByCommunity()
     if (graphNodeSize != 'SMALL') setNodeSizeSmall()
-    if (cancelCurrentAnimation) cancelCurrentAnimation()
     fa2Layout.start()
     FA2StartLabel.style.display = "none"
     FA2StopLabel.style.display = "flex"
@@ -331,7 +351,11 @@ function toggleFA2Layout() {
     }
 }
 // bind method to the forceatlas2 button
-FA2Button.addEventListener("click", toggleFA2Layout)
+if (FA2Button == null) {
+    console.error('To let user change layout to force atlas 2 add button: #forceatlas2')
+} else {
+    FA2Button.addEventListener("click", toggleFA2Layout)
+}
 
 
 /**
@@ -341,16 +365,20 @@ FA2Button.addEventListener("click", toggleFA2Layout)
  * 
  * 
  */
-// Button
-const randomButton = document.getElementById("random")
 // Function
 function randomLayout() {
     // stop fa2 if running
     if (fa2Layout.isRunning()) stopFA2()
     random.assign(graph);
 }
+// Button
+const randomButton = document.getElementById("random")
 // Bind function to button
-randomButton.addEventListener("click", randomLayout)
+if (randomButton == null) {
+    console.error('User change layout to random add: #random')
+} else {
+    randomButton.addEventListener("click", randomLayout)
+}
 
 
 /**
@@ -360,14 +388,19 @@ randomButton.addEventListener("click", randomLayout)
  * 
  * 
  */
-const circularButton = document.getElementById("circular")
 function circularLayout() {
     // stop fa2 if running
     if (fa2Layout.isRunning()) stopFA2()
     circular.assign(graph, { scale: 100 });
 }
+// Button
+const circularButton = document.getElementById("circular")
 // bind method to the random button
-circularButton.addEventListener("click", circularLayout)
+if (circularButton == null){
+    console.warn('User change layout to circular, add: #circular')
+} else {
+    circularButton.addEventListener("click", circularLayout)
+}
 
 
 /**
@@ -377,8 +410,6 @@ circularButton.addEventListener("click", circularLayout)
  * 
  * 
  */
-// Button
-const circlepackButton = document.getElementById("circlepack")
 // Function
 function circlepackLayout() {
     // stop fa2 if running
@@ -387,8 +418,14 @@ function circlepackLayout() {
     if (graphNodeColor != 'COMMUNITY') setNodeColorCommunity()
     circlepack.assign(graph, { scale: 100, hierarchyAttributes: ['degree', 'community'], });
 }
+// Button
+const circlepackButton = document.getElementById("circlepack")
 // Bind function to button
-circlepackButton.addEventListener("click", circlepackLayout)
+if (circlepackButton == null){
+    console.warn('User change layout to circlepack, add: #circlepack')
+} else {
+    circlepackButton.addEventListener("click", circlepackLayout)
+}
 
 
 /**
@@ -398,13 +435,16 @@ circlepackButton.addEventListener("click", circlepackLayout)
  * 
  * 
  */
-const circlepackPrimaryClanButton = document.getElementById("circlepackPrimaryClan")
 function circlepackPrimaryClanLayout() {
     // stop fa2 if running
     if (fa2Layout.isRunning()) stopFA2()
-    if (cancelCurrentAnimation) cancelCurrentAnimation()
-
     circlepack.assign(graph, { scale: 100, hierarchyAttributes: ['primaryclanid'], });
 }
+// button
+const circlepackPrimaryClanButton = document.getElementById("circlepackPrimaryClan")
 // bind method to the random button
-circlepackPrimaryClanButton.addEventListener("click", circlepackPrimaryClanLayout)
+if (circlepackPrimaryClanButton == null){
+    console.warn('User change layout to circlepack primary clan, add: #circlepackPrimaryClan')
+} else {
+    circlepackPrimaryClanButton.addEventListener("click", circlepackPrimaryClanLayout)
+}
