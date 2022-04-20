@@ -67,3 +67,4 @@ backend/steambro/steambroproject/config.py
 backend/steambro/steambroproject/config.py
 backend/steambro/MEDIA/SteamGame/*.png
 backend/steambro/steambroproject/config.py
+backend/steambro/steambroproject/secrets.py

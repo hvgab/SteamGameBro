@@ -14,7 +14,7 @@ import os
 
 from social_core.pipeline.social_auth import social_user
 from social_core.pipeline.user import get_username
-from . import config
+from . import secrets
 
 # from steambroproject.config import STEAM_API_KEY
 
@@ -28,7 +28,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'MEDIA')
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config.SECRET_KEY
+SECRET_KEY = secrets.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -43,7 +43,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 # STEAM
-STEAM_API_KEY = config.STEAM_API_KEY
+STEAM_API_KEY = secrets.STEAM_API_KEY
 STEAM_OPENID_URL = 'http://steamcommunity.com/openid'
 
 INSTALLED_APPS = [
@@ -181,7 +181,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_STEAM_API_KEY = config.STEAM_API_KEY
+SOCIAL_AUTH_STEAM_API_KEY = secrets.STEAM_API_KEY
 SOCIAL_AUTH_STEAM_EXTRA_DATA = ['player']
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
