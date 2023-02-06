@@ -20,6 +20,7 @@ django-service-objects = "*"
 xmltodict = "*"
 progress = "*"
 exceptionite = "*"
+django-allauth = "*"
 
 [dev-packages]
 

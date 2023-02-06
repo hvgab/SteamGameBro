@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8b58c89759b9faba7fb3e2808d6757b5e0c4ea31b12be81cd7396a5fce7db51e"
+            "sha256": "a88b8d75ad670f0270119681bdc6510cc56b4f733b1a32eff3ed1265b67e9cf1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -130,7 +130,7 @@
                 "sha256:a0713dc7a1de3f06bc0df5a9567ad19ead2d3d5689b434768a6145bff77c0667",
                 "sha256:f184f0d851d96b6d29297354ed981b7dd71df7ff500d82fa6d11f0856bee8035"
             ],
-            "markers": "python_version < '4' and python_full_version >= '3.6.2'",
+            "markers": "python_full_version >= '3.6.2' and python_full_version < '4.0.0'",
             "version": "==0.3.0"
         },
         "click-plugins": {
@@ -197,6 +197,13 @@
             "index": "pypi",
             "version": "==4.0.4"
         },
+        "django-allauth": {
+            "hashes": [
+                "sha256:ee3a174e249771caeb1d037e64b2704dd3c56cfec44f2058fae2214b224d35e8"
+            ],
+            "index": "pypi",
+            "version": "==0.50.0"
+        },
         "django-cors-headers": {
             "hashes": [
                 "sha256:a22be2befd4069c4fc174f11cf067351df5c061a3a5f94a01650b4e928b0372b",
@@ -252,11 +259,11 @@
         },
         "exceptionite": {
             "hashes": [
-                "sha256:1540b3850e2a25335e0d561c45c902d1e0d90d5f4777e483682b8d3ba75478bc",
-                "sha256:6af9dbb52aece2304280b26a516d32d57a924ca28299ae55d3b1bb91078c6825"
+                "sha256:6670742a1503d9bcd334824d3d0670ffa8c89e3cc228151ba8185ab747573644",
+                "sha256:8ab66b78bbddf32ca34b1110b5a1064a5c9e501f13a3bb0fefdba5cb79d93f17"
             ],
             "index": "pypi",
-            "version": "==2.2.2"
+            "version": "==2.2.4"
         },
         "idna": {
             "hashes": [
@@ -327,6 +334,14 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==2.1.1"
+        },
+        "mock": {
+            "hashes": [
+                "sha256:122fcb64ee37cfad5b3f48d7a7d51875d7031aaf3d8be7c42e2bee25044eee62",
+                "sha256:7d3fbbde18228f4ff2f1f119a45cdffa458b4c0dee32eb4d2bb2f82554bac7bc"
+            ],
+            "markers": "python_version >= '3.6'",
+            "version": "==4.0.3"
         },
         "oauthlib": {
             "hashes": [
@@ -428,6 +443,9 @@
             "version": "==2.21"
         },
         "pyjwt": {
+            "extras": [
+                "crypto"
+            ],
             "hashes": [
                 "sha256:b888b4d56f06f6dcd777210c334e69c737be74755d3e5e9ee3fe67dc18a0ee41",
                 "sha256:e0c4bb8d9f0af0c7f5b1ec4c5036309617d03d56932877f2f7a0beeb5318322f"
@@ -543,7 +561,7 @@
                 "sha256:44ece4d53fb1706f667c9bd1c648f5469a2ec925fcf3a776667042d645472c14",
                 "sha256:aabaf16477806a5e1dd19aa41f8c2b7950dd3c746362d7e3223dbe6de6ac448e"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_full_version < '4.0.0'",
             "version": "==1.26.9"
         },
         "vine": {

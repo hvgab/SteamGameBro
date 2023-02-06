@@ -20,28 +20,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
-    path(
-        'admin/doc/', 
-        include('django.contrib.admindocs.urls')),
-    path(
-        'admin/', 
-        admin.site.urls),
-    path(
-        '', 
-        include('steambroapp.urls', namespace='steambroapp'), 
-        name='steambro'),
-    path(
-        'social/',
-        include('social_django.urls', namespace='social'),
-        name='social'),
-    path(
-        'account/',
-        include('account.urls', namespace='account'),
-        name='account'),
-    path(
-        'api-auth/', 
-        include('rest_framework.urls', namespace='rest_framework')
-        ),
+    path('admin/doc/', include('django.contrib.admindocs.urls')),
+    path('admin/', admin.site.urls),
+    path('', include('steambroapp.urls', namespace='steambroapp'), name='steambro'),
+    # path('social/', include('social_django.urls', namespace='social'), name='social'),
+    # path('account/', include('account.urls', namespace='account'), name='account'),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('accounts/', include('allauth.urls')),
 ]
-    
-    

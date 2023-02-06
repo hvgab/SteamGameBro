@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 
-from social_core.pipeline.social_auth import social_user
-from social_core.pipeline.user import get_username
 from . import secrets
 
 # from steambroproject.config import STEAM_API_KEY
@@ -55,12 +53,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    # The following apps are required:
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # ... include the providers you want to enable:
+    'allauth.socialaccount.providers.steam',
+
     # 'django_celery_results',
     'django.contrib.admindocs',
     'rest_framework',
     'corsheaders',
     'account',
-    'social_django',
     'steambroapp',
     'dev_tags',
 ]
@@ -89,7 +95,10 @@ ROOT_URLCONF = 'steambroproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['steambro/steambroproject/templates', 'steambroproject/templates',],
+        'DIRS': [
+            'steambro/steambroproject/templates',
+            'steambroproject/templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -111,7 +120,8 @@ WSGI_APPLICATION = 'steambroproject.wsgi.application'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-DEFAULT_EXCEPTION_REPORTER = "exceptionite.django.ExceptioniteReporter"
+if DEBUG:
+    DEFAULT_EXCEPTION_REPORTER = "exceptionite.django.ExceptioniteReporter"
 
 DATABASES = {
     # 'default': {
@@ -133,20 +143,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME':
-        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME':
-        'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME':
-        'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME':
-        'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
@@ -158,7 +164,7 @@ if DEBUG:
     import os  # only if you haven't already imported this
     import socket  # only if you haven't already imported this
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+    INTERNAL_IPS = [ip[:ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
 
 LANGUAGE_CODE = 'en-us'
 
@@ -176,10 +182,26 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.open_id.OpenIdAuth',
-    'social_core.backends.steam.SteamOpenId',
     'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+SITE_ID = 1
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'steam': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': '123',
+            'secret': '456',
+            'key': ''
+        }
+    }
+}
 
 SOCIAL_AUTH_STEAM_API_KEY = secrets.STEAM_API_KEY
 SOCIAL_AUTH_STEAM_EXTRA_DATA = ['player']
@@ -231,7 +253,6 @@ LOGGING = {
         },
     },
 }
-
 
 CELERY_TIMEZONE = "Europe/Oslo"
 CELERY_TASK_TRACK_STARTED = True
